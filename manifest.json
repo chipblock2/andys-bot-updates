@@ -1,9 +1,9 @@
 {
   "package_type": "andys-bot-release-manifest",
-  "version": "5.13.3.1",
-  "display_version": "5.13.3.1 R5.4.1 Clear Position Values",
+  "version": "5.13.3.2",
+  "display_version": "5.13.3.2 R5.4.2 Protection & Risk Monitor",
   "kind": "ui",
-  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/releases/Andys_Bot_R5_4_1_Clear_Position_Values.zip",
-  "sha256": "276a50fb73fbd3121ddc2db1baa376b3d88cdd4a18d6a6b7c17a7e0de212fa29",
-  "notes": "UI-only clarity patch: separates price per coin from your cash position value and shows estimated cash outcomes at stop and target. No strategy, risk, exposure, order, credential or Coinbase changes."
+  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/releases/Andys_Bot_R5_4_2_Protection_Risk_Monitor.zip",
+  "sha256": "334dc7067aaa87fd4a604dcd2f1306693a7cc560e98c8cfd7cec6e8d7901de90",
+  "notes": "Cumulative UI-only upgrade: clear cash position values, Coinbase protection status, cash stop risk, target gain, risk/reward and closest-to-stop sorting. No strategy, sizing, safety limit, exposure, order, credential or Coinbase changes."
 }
