@@ -1,0 +1,9 @@
+{
+  "package_type": "andys-bot-release-manifest",
+  "version": "5.13.2-live-canary",
+  "display_version": "5.13.2 Multi-Venue Edge R5",
+  "kind": "full",
+  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/releases/andys_bot_update_channel_seed.zip",
+  "sha256": "3df0afed89a19df410e8a0f67ea76380f87f750b60c3354987079238f0677697",
+  "notes": "Current R5 baseline. No update should be staged while this version matches the running bot."
+}
