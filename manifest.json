@@ -1,9 +1,9 @@
 {
   "package_type": "andys-bot-release-manifest",
-  "version": "5.13.2.2",
-  "display_version": "5.13.2.2 R5.3.2 Live Priority Layout",
+  "version": "5.13.3.1",
+  "display_version": "5.13.3.1 R5.4.1 Clear Position Values",
   "kind": "ui",
-  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/releases/Andys_Bot_R5_3_2_Live_Priority_Layout.zip",
-  "sha256": "b38a6012f5e1b56b5cbea5c285f3e694f9a76bc5846975c692682358133286b7",
-  "notes": "UI-only layout upgrade: Live Portfolio first, Live Positions & Trades second in navigation, direct drill-down and return buttons. No strategy, risk, exposure, order or Coinbase changes."
+  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/releases/Andys_Bot_R5_4_1_Clear_Position_Values.zip",
+  "sha256": "276a50fb73fbd3121ddc2db1baa376b3d88cdd4a18d6a6b7c17a7e0de212fa29",
+  "notes": "UI-only clarity patch: separates price per coin from your cash position value and shows estimated cash outcomes at stop and target. No strategy, risk, exposure, order, credential or Coinbase changes."
 }
