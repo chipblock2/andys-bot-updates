@@ -1,9 +1,9 @@
 {
   "package_type": "andys-bot-release-manifest",
-  "version": "5.13.4",
-  "display_version": "5.13.4 R5.5 Live Order Watch",
+  "version": "5.13.5",
+  "display_version": "5.13.5 R5.6 Authoritative Trade Ledger",
   "kind": "full",
-  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/releases/Andys_Bot_R5_5_Live_Order_Watch.zip",
-  "sha256": "433ef4e36580286382fdd4451eeebc6d1d11053efb48866b1c27d1c4f1137d7f",
-  "notes": "Cumulative supervised-live safety upgrade: R5.4.2 clear cash/protection display plus authenticated observational Coinbase user-channel order updates, heartbeats, stale-stream recovery and visible REST fallback. REST remains authoritative. No automatic order submission, edit, cancellation or approval; existing positions, orders, credentials, £10 order cap, £20 exposure cap and manual PC approval are preserved."
+  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/Andys_Bot_R5_6_Authoritative_Trade_Ledger.zip",
+  "sha256": "91f1846e5720b1b1cf85a4193b3f097dc8b7b492cb5190915f81bbbc6c97dc86",
+  "notes": "Cumulative supervised-live safety upgrade with authoritative order-intent and exchange-event recovery. Existing positions, brackets, credentials and safety limits are preserved."
 }
