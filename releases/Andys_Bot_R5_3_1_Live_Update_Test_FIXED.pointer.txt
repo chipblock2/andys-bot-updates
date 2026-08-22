@@ -1,0 +1,1 @@
+Use FIXED release path; binary alias is committed separately.
