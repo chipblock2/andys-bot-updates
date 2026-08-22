@@ -3,7 +3,7 @@
   "version": "5.13.2.1",
   "display_version": "5.13.2.1 R5.3.1 Update Channel Test",
   "kind": "full",
-  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/releases/Andys_Bot_R5_3_1_Live_Update_Test_MIN.zip",
+  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/releases/Andys_Bot_R5_3_1_Live_Update_Test_MIN.zip?v=20260822-1018",
   "sha256": "f28917da004ebafdaa59ab90f3d2acf47963df1370321f98c6f222568fc30301",
   "notes": "Secure update-button test only. No trading, risk, exposure or order-limit changes. Installs a visible R5.3.1 UPDATE TEST marker."
 }
