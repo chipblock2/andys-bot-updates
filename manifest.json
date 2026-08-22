@@ -1,9 +1,9 @@
 {
   "package_type": "andys-bot-release-manifest",
-  "version": "5.13.2",
-  "display_version": "5.13.2 Multi-Venue Edge R5.3 Current Baseline",
-  "kind": "full",
-  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/releases/Andys_Bot_R5_3_1_Live_Update_Test_MIN.zip?v=withdrawn",
-  "sha256": "f28917da004ebafdaa59ab90f3d2acf47963df1370321f98c6f222568fc30301",
-  "notes": "R5.3.1 test release withdrawn after a local regression rollback. Current running R5.3 remains the safe baseline while the full-sync update is rebuilt."
+  "version": "5.13.2.2",
+  "display_version": "5.13.2.2 R5.3.2 Live Priority Layout",
+  "kind": "ui",
+  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/releases/Andys_Bot_R5_3_2_Live_Priority_Layout.zip",
+  "sha256": "b38a6012f5e1b56b5cbea5c285f3e694f9a76bc5846975c692682358133286b7",
+  "notes": "UI-only layout upgrade: Live Portfolio first, Live Positions & Trades second in navigation, direct drill-down and return buttons. No strategy, risk, exposure, order or Coinbase changes."
 }
