@@ -1,9 +1,9 @@
 {
   "package_type": "andys-bot-release-manifest",
-  "version": "5.13.3.2",
-  "display_version": "5.13.3.2 R5.4.2 Protection & Risk Monitor",
-  "kind": "ui",
-  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/releases/Andys_Bot_R5_4_2_Protection_Risk_Monitor.zip",
-  "sha256": "334dc7067aaa87fd4a604dcd2f1306693a7cc560e98c8cfd7cec6e8d7901de90",
-  "notes": "Cumulative UI-only upgrade: clear cash position values, Coinbase protection status, cash stop risk, target gain, risk/reward and closest-to-stop sorting. No strategy, sizing, safety limit, exposure, order, credential or Coinbase changes."
+  "version": "5.13.4",
+  "display_version": "5.13.4 R5.5 Live Order Watch",
+  "kind": "full",
+  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/releases/Andys_Bot_R5_5_Live_Order_Watch.zip",
+  "sha256": "433ef4e36580286382fdd4451eeebc6d1d11053efb48866b1c27d1c4f1137d7f",
+  "notes": "Cumulative supervised-live safety upgrade: R5.4.2 clear cash/protection display plus authenticated observational Coinbase user-channel order updates, heartbeats, stale-stream recovery and visible REST fallback. REST remains authoritative. No automatic order submission, edit, cancellation or approval; existing positions, orders, credentials, £10 order cap, £20 exposure cap and manual PC approval are preserved."
 }
