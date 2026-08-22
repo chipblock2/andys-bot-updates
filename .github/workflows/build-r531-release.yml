@@ -1,0 +1,40 @@
+name: Build R5.3.1 verified release
+
+on:
+  push:
+    paths:
+      - '.github/workflows/build-r531-release.yml'
+      - 'releases/Andys_Bot_R5_3_1_Live_Update_Test_MIN_v2.b64.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Decode verified release bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d releases/Andys_Bot_R5_3_1_Live_Update_Test_MIN_v2.b64.txt > releases/Andys_Bot_R5_3_1_Live_Update_Test_MIN.zip
+          echo "f28917da004ebafdaa59ab90f3d2acf47963df1370321f98c6f222568fc30301  releases/Andys_Bot_R5_3_1_Live_Update_Test_MIN.zip" | sha256sum -c -
+          unzip -t releases/Andys_Bot_R5_3_1_Live_Update_Test_MIN.zip
+
+      - name: Commit verified binary
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add releases/Andys_Bot_R5_3_1_Live_Update_Test_MIN.zip
+          if git diff --cached --quiet; then
+            echo "Verified ZIP already matches."
+          else
+            git commit -m "Repair R5.3.1 verified release binary"
+            git push
+          fi
