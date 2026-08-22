@@ -1,9 +1,9 @@
 {
   "package_type": "andys-bot-release-manifest",
-  "version": "5.13.5",
-  "display_version": "5.13.5 R5.6 Authoritative Trade Ledger",
-  "kind": "full",
-  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/Andys_Bot_R5_6_Authoritative_Trade_Ledger.zip",
-  "sha256": "91f1846e5720b1b1cf85a4193b3f097dc8b7b492cb5190915f81bbbc6c97dc86",
-  "notes": "Cumulative supervised-live safety upgrade with authoritative order-intent and exchange-event recovery. Existing positions, brackets, credentials and safety limits are preserved."
+  "version": "5.13.5.2",
+  "display_version": "5.13.5.2 R5.6.2 Single Dashboard Launcher",
+  "kind": "ui",
+  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/Andys_Bot_R5_6_2_Single_Dashboard_Patch.zip",
+  "sha256": "2dfe8a3704a9a9feec2b7f98d40871bf79b1cb28bfb18e19da47b602cb12c565",
+  "notes": "R5.6.2 fixes the Windows two-dashboard-page startup issue. The desktop launcher now suppresses server.py browser auto-open, opens one dashboard after the health check succeeds, and repeat clicks detect the already-running bot without opening another tab. Existing Coinbase positions, brackets, credentials, journals, evidence, the authoritative live ledger, £10 order cap, £20 exposure cap, eight-position ceiling, four-entry daily cap and manual PC Preview → Approve are preserved."
 }
