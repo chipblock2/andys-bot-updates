@@ -1,9 +1,9 @@
 {
   "package_type": "andys-bot-release-manifest",
-  "version": "5.13.5.2",
-  "display_version": "5.13.5.2 R5.6.2 Single Dashboard Launcher",
+  "version": "5.13.5.6",
+  "display_version": "5.13.5.6 R5.8.2 Updater End-to-End Proof",
   "kind": "ui",
-  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/Andys_Bot_R5_6_2_Single_Dashboard_Patch.zip",
-  "sha256": "2dfe8a3704a9a9feec2b7f98d40871bf79b1cb28bfb18e19da47b602cb12c565",
-  "notes": "R5.6.2 fixes the Windows two-dashboard-page startup issue. The desktop launcher now suppresses server.py browser auto-open, opens one dashboard after the health check succeeds, and repeat clicks detect the already-running bot without opening another tab. Existing Coinbase positions, brackets, credentials, journals, evidence, the authoritative live ledger, £10 order cap, £20 exposure cap, eight-position ceiling, four-entry daily cap and manual PC Preview → Approve are preserved."
+  "zip_url": "https://raw.githubusercontent.com/chipblock2/andys-bot-updates/main/Andys_Bot_R5_8_2_Updater_Proof.zip",
+  "sha256": "902d9bb474daf672a4603a835a578e20c9b7826554bb9cefd1b6e53f9e433dac",
+  "notes": "End-to-end proof for the repaired Andy's Bot updater. This release changes version/build metadata and writes a proof marker only. It does not change trading logic, live risk limits, Coinbase orders, stops, targets, credentials, live state or the authoritative ledger."
 }
