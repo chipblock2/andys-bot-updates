@@ -1,0 +1,25 @@
+{
+  "mode": "SHADOW_ONLY",
+  "scan_seconds": 300,
+  "deep_scan_seconds": 3600,
+  "agent_min_score": 78,
+  "watch_min_score": 65,
+  "max_positions_hard": 8,
+  "max_order_gbp_hard": 10.0,
+  "max_exposure_gbp_hard": 20.0,
+  "allow_live_orders": false,
+  "allow_transfers": false,
+  "allow_risk_changes": false,
+  "dashboard_host": "127.0.0.1",
+  "dashboard_port": 8793,
+  "bot_urls": [
+    "http://127.0.0.1:8765",
+    "http://127.0.0.1:8787",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:8080",
+    "http://127.0.0.1:5000",
+    "http://127.0.0.1:5001",
+    "http://127.0.0.1:8888",
+    "http://127.0.0.1:3000"
+  ]
+}
