@@ -1,12 +1,23 @@
 {
-  "name": "Ask Shropshire – Family Day Finder",
+  "name": "Ask Shropshire",
   "short_name": "Ask Shropshire",
-  "description": "Find family events and places to visit in Shropshire without searching lots of different websites.",
+  "description": "Find family events, places to visit, maps and practical local information across Shropshire.",
+  "id": "./index.html",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "background_color": "#fffaf0",
   "theme_color": "#073f3a",
+  "orientation": "portrait-primary",
   "lang": "en-GB",
-  "categories": ["travel", "lifestyle", "family"]
+  "categories": ["travel", "lifestyle", "family"],
+  "icons": [
+    {"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"},
+    {"src":"./maskable.svg","sizes":"any","type":"image/svg+xml","purpose":"maskable"}
+  ],
+  "shortcuts": [
+    {"name":"Family Day Finder","short_name":"Family","url":"./index.html#family","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml"}]},
+    {"name":"Explore Shropshire","short_name":"Explore","url":"./index.html#explore","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml"}]}
+  ]
 }
