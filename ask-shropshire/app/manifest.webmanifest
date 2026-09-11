@@ -13,11 +13,12 @@
   "lang": "en-GB",
   "categories": ["travel", "lifestyle", "family"],
   "icons": [
-    {"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"},
+    {"src":"./icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"./icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
     {"src":"./maskable.svg","sizes":"any","type":"image/svg+xml","purpose":"maskable"}
   ],
   "shortcuts": [
-    {"name":"Family Day Finder","short_name":"Family","url":"./index.html#family","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml"}]},
-    {"name":"Explore Shropshire","short_name":"Explore","url":"./index.html#explore","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml"}]}
+    {"name":"Family Day Finder","short_name":"Family","url":"./index.html#family","icons":[{"src":"./icon-192.png","sizes":"192x192","type":"image/png"}]},
+    {"name":"Explore Shropshire","short_name":"Explore","url":"./index.html#explore","icons":[{"src":"./icon-192.png","sizes":"192x192","type":"image/png"}]}
   ]
 }
