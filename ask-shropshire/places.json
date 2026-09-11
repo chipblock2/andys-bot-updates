@@ -1,0 +1,54 @@
+{
+  "generated_at": "2026-09-11T04:40:00Z",
+  "source": "Ask Shropshire Content Hub",
+  "places": [
+    {
+      "id": "recUYfg10B1OZdvm7",
+      "name": "Telford Theatre",
+      "status": "Published",
+      "type": "Venue",
+      "town": "Telford",
+      "website": "https://www.telfordtheatre.com/",
+      "description": "Theatre and live entertainment venue serving Telford and the wider Shropshire area.",
+      "source_url": "https://www.telfordtheatre.com/",
+      "last_checked": "2026-09-11T04:35:00Z",
+      "featured": true
+    },
+    {
+      "id": "rec3INZosHMxVvKyQ",
+      "name": "The Iron Bridge & Ironbridge Gorge",
+      "status": "Published",
+      "type": "Attraction",
+      "town": "Ironbridge",
+      "website": "https://www.ironbridge.org.uk/",
+      "description": "UNESCO World Heritage landscape centred on the Iron Bridge, museums and industrial heritage sites in the Severn Gorge.",
+      "source_url": "https://www.ironbridge.org.uk/",
+      "last_checked": "2026-09-11T04:35:00Z",
+      "featured": true
+    },
+    {
+      "id": "recTS36glr8QH1IbR",
+      "name": "Carding Mill Valley & the Long Mynd",
+      "status": "Published",
+      "type": "Walk Outdoor",
+      "town": "Church Stretton",
+      "website": "https://www.nationaltrust.org.uk/visit/shropshire-staffordshire/carding-mill-valley-and-the-long-mynd",
+      "description": "National Trust countryside in the Shropshire Hills with walking routes, valley scenery and access to the Long Mynd.",
+      "source_url": "https://www.nationaltrust.org.uk/visit/shropshire-staffordshire/carding-mill-valley-and-the-long-mynd",
+      "last_checked": "2026-09-11T04:35:00Z",
+      "featured": true
+    },
+    {
+      "id": "recyEiJWr7cxV6g4A",
+      "name": "Shrewsbury town centre",
+      "status": "Published",
+      "type": "Attraction",
+      "town": "Shrewsbury",
+      "website": "https://www.visitshropshire.co.uk/destinations/shrewsbury/",
+      "description": "Historic county town with independent shops, food, riverside walks and heritage attractions.",
+      "source_url": "https://www.visitshropshire.co.uk/destinations/shrewsbury/",
+      "last_checked": "2026-09-11T04:35:00Z",
+      "featured": true
+    }
+  ]
+}
