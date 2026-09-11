@@ -1,0 +1,1 @@
+window.ASK_SHROPSHIRE_INTAKE_ENDPOINTS={event:null,offer:null,business_claim:null,business_update:null,alerts:null};
