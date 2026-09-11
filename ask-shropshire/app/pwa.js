@@ -67,3 +67,8 @@ if('serviceWorker' in navigator){
     routeFromHash();
   });
 } else {window.addEventListener('load',routeFromHash);}
+
+const featureScript=document.createElement('script');
+featureScript.src='features.js';
+featureScript.defer=true;
+document.body.appendChild(featureScript);
