@@ -46,7 +46,7 @@ function injectCommunityTools(){
   if(quick&&!quick.querySelector('[data-community="deals"]'))quick.insertAdjacentHTML('beforeend','<button data-community="deals"><b>🏷 Deals & offers</b><span>Current local offers, with sponsored promotions clearly labelled.</span></button>');
   quick?.querySelector('[data-community="deals"]')?.addEventListener('click',()=>location.href='deals.html');
   const moreCards=document.querySelector('#moreView .cards');
-  if(moreCards&&!document.getElementById('communityActionsCard'))moreCards.insertAdjacentHTML('afterbegin',`<div class="card" id="communityActionsCard"><h3>Take part</h3><p class="desc">Submit a local event, manage a business listing, choose useful alerts or browse current deals.</p><div class="buttons"><a class="mini go" href="submit-event.html">Submit event</a><a class="mini" href="claim-business.html">Claim business</a><a class="mini" href="update-business.html">Update claimed listing</a><a class="mini" href="alerts.html">Alerts</a><a class="mini" href="deals.html">Deals</a></div></div>`);
+  if(moreCards&&!document.getElementById('communityActionsCard'))moreCards.insertAdjacentHTML('afterbegin',`<div class="card" id="communityActionsCard"><h3>Take part</h3><p class="desc">Submit a local event, manage a business listing, choose useful alerts or browse current deals.</p><div class="buttons"><a class="mini go" href="submit-event.html">Submit event</a><a class="mini" href="claim-business.html">Claim business</a><a class="mini" href="update-business.html">Update claimed listing</a><a class="mini" href="alerts.html">Alerts</a><a class="mini" href="deals.html">Deals</a><a class="mini" href="search-feedback.html">Report missing result</a></div></div>`);
 }
 injectCommunityTools();
 
@@ -72,3 +72,9 @@ const featureScript=document.createElement('script');
 featureScript.src='features.js';
 featureScript.defer=true;
 document.body.appendChild(featureScript);
+featureScript.addEventListener('load',()=>{
+  const finalScript=document.createElement('script');
+  finalScript.src='final-enhancements.js';
+  finalScript.defer=true;
+  document.body.appendChild(finalScript);
+});
