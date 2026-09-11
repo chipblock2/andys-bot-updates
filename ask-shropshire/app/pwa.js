@@ -6,13 +6,11 @@ window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();def
 if(installBtn){installBtn.addEventListener('click',async()=>{if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;installBtn.hidden=true;});}
 window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;if(installBtn)installBtn.hidden=true;});
 
-// Launch-test hardening: structured hours that say closed must exclude a place.
 if(typeof scorePlace==='function'){
   const originalScorePlace=scorePlace;
   scorePlace=function(...args){const result=originalScorePlace(...args);return result?.opening?.state==='closed'?null:result;};
 }
 
-// Lightweight natural-query handling for common Ask Shropshire questions.
 const searchStopWords=new Set(['what','whats','what’s','on','near','me','in','at','the','a','an','find','show','for','to','do','is','are','this','with','please']);
 function plusDays(day,n){const d=new Date(day+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);}
 function smartExplore(){
@@ -48,7 +46,7 @@ function injectCommunityTools(){
   if(quick&&!quick.querySelector('[data-community="deals"]'))quick.insertAdjacentHTML('beforeend','<button data-community="deals"><b>🏷 Deals & offers</b><span>Current local offers, with sponsored promotions clearly labelled.</span></button>');
   quick?.querySelector('[data-community="deals"]')?.addEventListener('click',()=>location.href='deals.html');
   const moreCards=document.querySelector('#moreView .cards');
-  if(moreCards&&!document.getElementById('communityActionsCard'))moreCards.insertAdjacentHTML('afterbegin',`<div class="card" id="communityActionsCard"><h3>Take part</h3><p class="desc">Submit a local event, claim your business listing, choose useful alerts or browse current deals.</p><div class="buttons"><a class="mini go" href="submit-event.html">Submit event</a><a class="mini" href="claim-business.html">Claim business</a><a class="mini" href="alerts.html">Alerts</a><a class="mini" href="deals.html">Deals</a></div></div>`);
+  if(moreCards&&!document.getElementById('communityActionsCard'))moreCards.insertAdjacentHTML('afterbegin',`<div class="card" id="communityActionsCard"><h3>Take part</h3><p class="desc">Submit a local event, manage a business listing, choose useful alerts or browse current deals.</p><div class="buttons"><a class="mini go" href="submit-event.html">Submit event</a><a class="mini" href="claim-business.html">Claim business</a><a class="mini" href="update-business.html">Update claimed listing</a><a class="mini" href="alerts.html">Alerts</a><a class="mini" href="deals.html">Deals</a></div></div>`);
 }
 injectCommunityTools();
 
