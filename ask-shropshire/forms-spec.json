@@ -1,36 +1,11 @@
 {
-  "version": 2,
-  "transport_note": "Public forms must use a secure form/backend service. Never expose Airtable credentials in browser code. Event and offer form payloads should be stored as structured JSON in the Submissions Details field for the approved-submission processor.",
+  "version": 3,
+  "transport_note": "Public forms must use a secure form/backend service. Never expose Airtable credentials in browser code. Event, offer and correction form payloads should be stored as structured JSON in the Submissions Details field for the approved-submission processor.",
   "forms": {
-    "event": {
-      "title": "Submit an event",
-      "destination": "Submissions Queue",
-      "defaults": {"submission_type": "Event", "status": "New"},
-      "fields": ["event_name","contact_name","email","business_venue","town","postcode","start_date_time","end_date_time","price_or_free","booking_url","source_link","age_guidance","accessibility","parking_transport","details","consent"],
-      "review_rule": "Nothing becomes public until reviewed and approved."
-    },
-    "offer": {
-      "title": "Submit an offer or promotion",
-      "destination": "Submissions Queue",
-      "defaults": {"submission_type": "Offer Promotion", "status": "New"},
-      "fields": ["offer_name","contact_name","email","business_venue","town","start_date_time","end_date_time","offer_code","terms","landing_url","source_link","sponsored","consent"],
-      "review_rule": "Offers must be current, genuine and approved. Sponsored status must be explicit and remains clearly labelled in the public app."
-    },
-    "business_claim": {
-      "title": "Claim a business listing",
-      "destination": "Business Claims",
-      "defaults": {"status": "New"},
-      "fields": ["business_name","contact_name","email","phone","town","postcode","website","evidence","requested_changes","consent"],
-      "review_rule": "Ownership or authority must be verified before a listing is marked claimed."
-    },
-    "alerts": {
-      "title": "Ask Shropshire alerts",
-      "destination": "Alert Subscriptions",
-      "defaults": {"enabled": true},
-      "fields": ["email","area","radius_miles","categories","family_friendly","dog_friendly","accessible","frequency","consent"],
-      "categories": ["Live music","Theatre","Family","Food","Walks outdoors","Markets","Festivals","Offers","Accessibility"],
-      "frequencies": ["Instant important changes","Daily","Weekly"],
-      "privacy_rule": "Store only the email and preferences needed to deliver the requested alerts."
-    }
+    "event": {"title":"Submit an event","destination":"Submissions Queue","defaults":{"submission_type":"Event","status":"New"},"fields":["event_name","contact_name","email","business_venue","town","postcode","start_date_time","end_date_time","price_or_free","booking_url","source_link","age_guidance","accessibility","parking_transport","details","consent"],"review_rule":"Nothing becomes public until reviewed and approved."},
+    "offer": {"title":"Submit an offer or promotion","destination":"Submissions Queue","defaults":{"submission_type":"Offer Promotion","status":"New"},"fields":["offer_name","contact_name","email","business_venue","town","start_date_time","end_date_time","offer_code","terms","landing_url","source_link","sponsored","consent"],"review_rule":"Offers must be current, genuine and approved. Sponsored status must be explicit and remains clearly labelled in the public app."},
+    "business_claim": {"title":"Claim a business listing","destination":"Business Claims","defaults":{"status":"New"},"fields":["business_name","contact_name","email","phone","town","postcode","website","evidence","requested_changes","consent"],"review_rule":"Ownership or authority must be verified before a listing is marked claimed."},
+    "business_update": {"title":"Update a claimed business listing","destination":"Submissions Queue","defaults":{"submission_type":"Correction","status":"New"},"fields":["business_name","claimant_email","postcode","website","phone","opening_hours","booking_url","accessibility","parking_transport","description_update","source_link","consent"],"review_rule":"The requester must match a Verified Business Claim for the same business before an approved correction can change public listing data."},
+    "alerts": {"title":"Ask Shropshire alerts","destination":"Alert Subscriptions","defaults":{"enabled":true},"fields":["email","area","radius_miles","categories","family_friendly","dog_friendly","accessible","frequency","consent"],"categories":["Live music","Theatre","Family","Food","Walks outdoors","Markets","Festivals","Offers","Accessibility"],"frequencies":["Instant important changes","Daily","Weekly"],"privacy_rule":"Store only the email and preferences needed to deliver the requested alerts."}
   }
 }
