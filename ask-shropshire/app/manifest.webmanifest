@@ -1,0 +1,12 @@
+{
+  "name": "Ask Shropshire – Family Day Finder",
+  "short_name": "Ask Shropshire",
+  "description": "Find family events and places to visit in Shropshire without searching lots of different websites.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fffaf0",
+  "theme_color": "#073f3a",
+  "lang": "en-GB",
+  "categories": ["travel", "lifestyle", "family"]
+}
