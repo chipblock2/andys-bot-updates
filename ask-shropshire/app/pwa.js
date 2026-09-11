@@ -6,8 +6,7 @@ window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();def
 if(installBtn){installBtn.addEventListener('click',async()=>{if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;installBtn.hidden=true;});}
 window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;if(installBtn)installBtn.hidden=true;});
 
-// Launch-test hardening: if structured hours say a place is closed at the selected time,
-// do not let it appear as a recommended family option merely because the score is still positive.
+// Launch-test hardening: structured hours that say closed must exclude a place.
 if(typeof scorePlace==='function'){
   const originalScorePlace=scorePlace;
   scorePlace=function(...args){const result=originalScorePlace(...args);return result?.opening?.state==='closed'?null:result;};
@@ -43,6 +42,15 @@ const exploreBtn=document.getElementById('exploreBtn');
 if(exploreBtn)exploreBtn.onclick=smartExplore;
 const exploreAsk=document.getElementById('exploreAsk');
 if(exploreAsk)exploreAsk.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();smartExplore();}});
+
+function injectCommunityTools(){
+  const quick=document.querySelector('#homeView .quick');
+  if(quick&&!quick.querySelector('[data-community="deals"]'))quick.insertAdjacentHTML('beforeend','<button data-community="deals"><b>🏷 Deals & offers</b><span>Current local offers, with sponsored promotions clearly labelled.</span></button>');
+  quick?.querySelector('[data-community="deals"]')?.addEventListener('click',()=>location.href='deals.html');
+  const moreCards=document.querySelector('#moreView .cards');
+  if(moreCards&&!document.getElementById('communityActionsCard'))moreCards.insertAdjacentHTML('afterbegin',`<div class="card" id="communityActionsCard"><h3>Take part</h3><p class="desc">Submit a local event, claim your business listing, choose useful alerts or browse current deals.</p><div class="buttons"><a class="mini go" href="submit-event.html">Submit event</a><a class="mini" href="claim-business.html">Claim business</a><a class="mini" href="alerts.html">Alerts</a><a class="mini" href="deals.html">Deals</a></div></div>`);
+}
+injectCommunityTools();
 
 if('serviceWorker' in navigator){
   window.addEventListener('load',async()=>{
