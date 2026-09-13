@@ -31,7 +31,13 @@ jobs:
           generated=now.isoformat().replace('+00:00','Z')
 
           def load(path):
-              with open(path,encoding='utf-8') as f: return json.load(f)
+              with open(path,encoding='utf-8') as f: text=f.read()
+              text=text.lstrip()
+              obj,end=json.JSONDecoder().raw_decode(text)
+              tail=text[end:].strip()
+              if tail:
+                  print(f'Ignoring trailing staging artefact in {path}: {tail[:80]!r}')
+              return obj
           def dump(path,obj):
               with open(path,'w',encoding='utf-8') as f:
                   json.dump(obj,f,ensure_ascii=False,separators=(',',':'))
