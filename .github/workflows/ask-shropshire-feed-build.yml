@@ -29,6 +29,7 @@ jobs:
           IN=os.path.join(ROOT,'sync-input')
           now=datetime.now(timezone.utc)
           generated=now.isoformat().replace('+00:00','Z')
+          expected_published_events=162
 
           def load(path):
               with open(path,encoding='utf-8') as f: text=f.read()
@@ -46,11 +47,22 @@ jobs:
               return datetime.fromisoformat(v.replace('Z','+00:00'))
           def norm(v): return ' '.join(str(v or '').strip().lower().split())
 
-          raw=[]
-          for path in sorted(glob.glob(os.path.join(IN,'events-*.json'))): raw.extend(load(path))
-          assert len(raw)==138, f'Expected 138 staged Published events, got {len(raw)}'
-          assert all(x.get('status')=='Published' for x in raw), 'Non-Published event in public staging'
+          # Start from the last validated Airtable-built main feed, then overlay every
+          # current Airtable record staged since that build. Overlay by Airtable record ID
+          # first so changed fields replace the prior version even when External ID is blank.
+          base=load(os.path.join(ROOT,'events.json'))['events']
+          by_id={x['id']:x for x in base}
+          overlaid=0
+          for path in sorted(glob.glob(os.path.join(IN,'events-*.json'))):
+              staged=load(path)
+              assert all(x.get('status')=='Published' for x in staged), 'Non-Published event in public staging'
+              for x in staged:
+                  if x['id'] in by_id: overlaid+=1
+                  by_id[x['id']]=x
+          raw=list(by_id.values())
 
+          # Deduplicate current records by External ID where one exists. Blank External IDs
+          # deliberately fall back to Airtable record ID rather than guessing from names/times.
           by_key={}
           duplicates=[]
           for x in raw:
@@ -62,6 +74,7 @@ jobs:
                   if str(x.get('last_checked') or '') > str(old.get('last_checked') or ''): by_key[key]=x
               else: by_key[key]=x
           deduped=list(by_key.values())
+
           expired=[]
           events=[]
           for x in deduped:
@@ -69,7 +82,11 @@ jobs:
               if end and end <= now: expired.append(x)
               else: events.append(x)
           events.sort(key=lambda x:(x.get('start') or '9999',norm(x.get('name'))))
-          assert len(events)+len(expired)==len(deduped), 'Event validation mismatch'
+          # The Airtable read immediately before staging contained 162 Published rows after
+          # five ended records were marked Expired. External-ID duplicates, if any, reduce
+          # the public row count but remain accounted for in this assertion.
+          assert len(events)+len(duplicates)==expected_published_events, \
+              f'Event set mismatch: events={len(events)} duplicate_external_ids={len(duplicates)} expected Published={expected_published_events}'
 
           places=load(os.path.join(IN,'places.json'))
           offers=load(os.path.join(IN,'offers.json'))
@@ -80,11 +97,15 @@ jobs:
 
           def unique(items,keyfn):
               out={}
-              for x in items: out.setdefault(keyfn(x),x)
-              return list(out.values())
-          places=unique(places,lambda x:norm(x.get('name')))
-          offers=unique(offers,lambda x:norm(x.get('id') or f"{x.get('name')}|{x.get('business_venue')}|{x.get('start')}"))
-          tips=unique(tips,lambda x:norm(f"{x.get('tip')}|{x.get('place_business')}|{x.get('town')}"))
+              duplicates=[]
+              for x in items:
+                  key=keyfn(x)
+                  if key in out: duplicates.append(key)
+                  else: out[key]=x
+              return list(out.values()),duplicates
+          places,place_duplicates=unique(places,lambda x:norm(x.get('name')))
+          offers,offer_duplicates=unique(offers,lambda x:norm(x.get('id') or f"{x.get('name')}|{x.get('business_venue')}|{x.get('start')}"))
+          tips,tip_duplicates=unique(tips,lambda x:norm(f"{x.get('tip')}|{x.get('place_business')}|{x.get('town')}"))
           current_offers=[]
           expired_offers=[]
           for x in offers:
@@ -101,13 +122,14 @@ jobs:
           dump(os.path.join(ROOT,'offers.json'),{'generated_at':generated,'source':'Ask Shropshire Content Hub','offers':current_offers})
           dump(os.path.join(ROOT,'tips.json'),{'generated_at':generated,'source':'Ask Shropshire Content Hub','tips':tips})
 
-          # Re-open the rebuilt main feed before clearing the temporary overlay.
+          # Only clear the temporary overlay after the rebuilt main feed has been re-opened
+          # and confirmed to contain the validated current event set.
           confirmed=load(os.path.join(ROOT,'events.json'))['events']
           assert len(confirmed)==len(events), 'Main events feed re-open validation failed'
-          assert {x['id'] for x in confirmed}=={x['id'] for x in events}, 'Main events feed does not match validated Airtable export'
+          assert {x['id'] for x in confirmed}=={x['id'] for x in events}, 'Main events feed does not match validated event set'
           dump(os.path.join(ROOT,'events-extra.json'),{'generated_at':generated,'source':'Ask Shropshire temporary overlay','events':[]})
 
-          report={'events':len(events),'places':len(places),'offers':len(current_offers),'tips':len(tips),'event_duplicates':len(duplicates),'expired_events':len(expired),'expired_offers':len(expired_offers)}
+          report={'events':len(events),'places':len(places),'offers':len(current_offers),'tips':len(tips),'event_duplicates':len(duplicates),'place_duplicates':len(place_duplicates),'offer_duplicates':len(offer_duplicates),'tip_duplicates':len(tip_duplicates),'expired_events':len(expired),'expired_offers':len(expired_offers),'event_overlays':overlaid}
           dump(os.path.join(ROOT,'feed-sync-report.json'),report)
           print(json.dumps(report))
 
