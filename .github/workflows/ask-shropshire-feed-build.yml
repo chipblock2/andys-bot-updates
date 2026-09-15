@@ -29,7 +29,7 @@ jobs:
           IN=os.path.join(ROOT,'sync-input')
           now=datetime.now(timezone.utc)
           generated=now.isoformat().replace('+00:00','Z')
-          expected_published_events=145
+          expected_published_events=177
 
           def load(path):
               with open(path,encoding='utf-8') as f: text=f.read()
@@ -47,9 +47,9 @@ jobs:
               return datetime.fromisoformat(v.replace('Z','+00:00'))
           def norm(v): return ' '.join(str(v or '').strip().lower().split())
 
-          # Start from the last validated Airtable-built main feed, then overlay every
-          # current Airtable record staged since that build. Overlay by Airtable record ID
-          # first so changed fields replace the prior version even when External ID is blank.
+          # Start from the last validated Airtable-built main feed, then overlay current
+          # Airtable records staged since that build. Overlay by Airtable record ID first
+          # so changed fields replace the prior version even when External ID is blank.
           base=load(os.path.join(ROOT,'events.json'))['events']
           by_id={x['id']:x for x in base}
           overlaid=0
@@ -61,8 +61,8 @@ jobs:
                   by_id[x['id']]=x
           raw=list(by_id.values())
 
-          # Deduplicate current records by External ID where one exists. Blank External IDs
-          # deliberately fall back to Airtable record ID rather than guessing from names/times.
+          # Deduplicate by External ID where one exists. Blank External IDs deliberately
+          # fall back to Airtable record ID instead of guessing from names, venues or times.
           by_key={}
           duplicates=[]
           for x in raw:
@@ -82,9 +82,9 @@ jobs:
               if end and end <= now: expired.append(x)
               else: events.append(x)
           events.sort(key=lambda x:(x.get('start') or '9999',norm(x.get('name'))))
-          # The Airtable read immediately before staging contained 145 Published rows after
-          # ended records through 15 September were marked Expired. External-ID duplicates,
-          # if any, reduce the public row count but remain accounted for in this assertion.
+          # The Airtable read immediately before this staging commit contained 177
+          # Published rows. External-ID duplicates, if any, reduce the public count but
+          # remain accounted for in the assertion below.
           assert len(events)+len(duplicates)==expected_published_events, \
               f'Event set mismatch: events={len(events)} duplicate_external_ids={len(duplicates)} expected Published={expected_published_events}'
 
