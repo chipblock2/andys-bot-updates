@@ -29,7 +29,7 @@ jobs:
           IN=os.path.join(ROOT,'sync-input')
           now=datetime.now(timezone.utc)
           generated=now.isoformat().replace('+00:00','Z')
-          expected_published_events=162
+          expected_published_events=145
 
           def load(path):
               with open(path,encoding='utf-8') as f: text=f.read()
@@ -82,9 +82,9 @@ jobs:
               if end and end <= now: expired.append(x)
               else: events.append(x)
           events.sort(key=lambda x:(x.get('start') or '9999',norm(x.get('name'))))
-          # The Airtable read immediately before staging contained 162 Published rows after
-          # five ended records were marked Expired. External-ID duplicates, if any, reduce
-          # the public row count but remain accounted for in this assertion.
+          # The Airtable read immediately before staging contained 145 Published rows after
+          # ended records through 15 September were marked Expired. External-ID duplicates,
+          # if any, reduce the public row count but remain accounted for in this assertion.
           assert len(events)+len(duplicates)==expected_published_events, \
               f'Event set mismatch: events={len(events)} duplicate_external_ids={len(duplicates)} expected Published={expected_published_events}'
 
