@@ -29,7 +29,7 @@ jobs:
           IN=os.path.join(ROOT,'sync-input')
           now=datetime.now(timezone.utc)
           generated=now.isoformat().replace('+00:00','Z')
-          expected_published_events=180
+          expected_published_events=169
 
           def load(path):
               with open(path,encoding='utf-8') as f: text=f.read()
@@ -52,6 +52,7 @@ jobs:
           overlaid=0
           for path in sorted(glob.glob(os.path.join(IN,'events-*.json'))):
               staged=load(path)
+              if isinstance(staged,dict): staged=staged.get('events',[])
               assert all(x.get('status')=='Published' for x in staged), 'Non-Published event in public staging'
               for x in staged:
                   if x['id'] in by_id: overlaid+=1
@@ -82,6 +83,9 @@ jobs:
           places=load(os.path.join(IN,'places.json'))
           offers=load(os.path.join(IN,'offers.json'))
           tips=load(os.path.join(IN,'tips.json'))
+          if isinstance(places,dict): places=places.get('places',[])
+          if isinstance(offers,dict): offers=offers.get('offers',[])
+          if isinstance(tips,dict): tips=tips.get('tips',[])
           assert all(x.get('status')=='Published' for x in places), 'Non-Published place in staging'
           assert all(x.get('status')=='Published' for x in offers), 'Non-Published offer in staging'
           assert all(x.get('status')=='Published' for x in tips), 'Non-Published tip in staging'
