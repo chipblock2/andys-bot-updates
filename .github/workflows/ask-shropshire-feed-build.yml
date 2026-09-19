@@ -29,7 +29,7 @@ jobs:
           IN=os.path.join(ROOT,'sync-input')
           now=datetime.now(timezone.utc)
           generated=now.isoformat().replace('+00:00','Z')
-          expected_published_events=198
+          expected_published_events=210
 
           def load(path):
               with open(path,encoding='utf-8') as f: text=f.read()
