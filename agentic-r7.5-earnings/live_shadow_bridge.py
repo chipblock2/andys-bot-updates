@@ -15,7 +15,33 @@ TAKER_LAB=ROOT/"state"/"strategy_lab_taker_status.json"
 STATUS=ROOT/"state"/"r7_5_live_shadow_status.json"
 AUDIT=ROOT/"state"/"r7_5_live_shadow_audit.jsonl"
 URL="http://127.0.0.1:8787/api/live"
-CANDIDATES=[("ETH-GBP","breakout"),("ETH-GBP","trend"),("BTC-GBP","breakout")]
+FALLBACK_CANDIDATES=[("ETH-GBP","breakout"),("ETH-GBP","trend"),("BTC-GBP","breakout")]
+
+def _candidate_specs(lab_status,d):
+    rows=[]
+    assets=d.get("assets") or {}
+    for r in (lab_status.get("results") or []):
+        if str(r.get("verdict") or "").upper()!="PASS": continue
+        product=str(r.get("market") or "").upper(); strategy=str(r.get("strategy") or "").lower()
+        sym=product.split("-")[0]
+        if not product.endswith("-GBP") or sym not in assets: continue
+        m=r.get("metrics") or {}
+        rows.append((float(m.get("monthly") or 0),float(m.get("pf") or 0),product,strategy))
+    rows.sort(reverse=True)
+    return [(p,s) for _m,_pf,p,s in rows] or list(FALLBACK_CANDIDATES)
+
+def _strategy_compatible(strategy,a):
+    live_strategy=str(a.get("strategy") or "").upper()
+    opp=a.get("market_opportunity") or {}
+    location=str(opp.get("trade_location") or "").upper()
+    strategy=str(strategy or "").lower()
+    if strategy=="breakout":
+        return live_strategy in {"MOMENTUM","SWING_TREND","MEME_RETEST"} and (bool(opp.get("breakout")) or location.startswith("BREAKOUT"))
+    if strategy=="trend":
+        return live_strategy in {"MOMENTUM","SWING_TREND"}
+    if strategy=="meanrev":
+        return live_strategy in {"MEAN_REVERSION","FAIR_VALUE_REVERSION"}
+    return False
 
 def load_json(path, default=None):
     try: return json.loads(path.read_text(encoding="utf-8"))
@@ -86,7 +112,7 @@ def _validation(lab_status,product,strategy):
 def run_once():
     d=get_live(); lab=load_json(LAB); taker_lab=load_json(TAKER_LAB); cfg=live_config(d); fees=fee_summary(d); port=portfolio(d,cfg)
     rows=[]
-    for product,strategy in CANDIDATES:
+    for product,strategy in _candidate_specs(lab,d):
         sym=product.split("-")[0]; a=(d.get("assets") or {}).get(sym) or {}
         score=float((a.get("decision_council") or {}).get("score") or 0.0)
         expected=float(a.get("expected_return") or 0.0)
@@ -97,7 +123,12 @@ def run_once():
         base_action=str(a.get("action") or "HOLD").upper()
         row["base_action"]=base_action
         row["base_reason"]=a.get("reason") or ""
+        row["strategy_compatible"]=_strategy_compatible(strategy,a)
         row["smart_execution"]=smart_route(row,a,d.get("market_maker_lab") or {},SMART_EXECUTION_CONFIG)
+        if not row["strategy_compatible"]:
+            row["state"]="WATCH" if row["health"]["state"]!="OFF" else "REJECT"
+            row["execution"]={"action":"NO_ORDER","reason":"walk-forward strategy family does not match live strategy/location"}
+            row["reasons"]=list(dict.fromkeys(row.get("reasons",[])+["strategy family mismatch with live engine"]))
         row["execution_validation"]={"maker":_validation(lab,product,strategy),"taker":_validation(taker_lab,product,strategy)}
         if row.get("state")=="SHADOW_READY" and row["smart_execution"].get("route")=="TAKER_NOW" and row["execution_validation"]["taker"].get("verdict")!="PASS":
             row["state"]="WATCH"
