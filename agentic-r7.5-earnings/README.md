@@ -31,3 +31,23 @@ Additional R7.5 profit protection:
 
 Account-fee rule:
 R7.5 will not mark a candidate SHADOW_READY when it only has fallback fee assumptions. It requires account-specific Coinbase fee-tier data before readiness.
+
+
+## Studio live-shadow deployment
+The Studio bot now runs a separate R7.5 read-only bridge against the existing local /api/live endpoint on port 8787. The bridge inherits the bot's current supervised live limits instead of overwriting them.
+
+Observed deployment configuration on 2026-09-21:
+- Live mode: GBP100 supervised
+- Live order cap: GBP15
+- Live exposure cap: GBP100
+- Max live positions: 8
+- Coinbase authenticated fee profile: VIP 1, 0.06% maker / 0.16% taker at the time observed
+
+The bridge consumes existing Coinbase L2 order-book fields, fee_profile, live_canary and model decisions. It cannot place, approve, cancel or modify live orders.
+
+A real-fee walk-forward rerun using 0.06% maker fees produced:
+- ETH-GBP breakout: PASS, +22.8%, PF 1.85, 13.1% max drawdown
+- ETH-GBP trend: PASS, +17.4%, PF 1.31, 14.2% max drawdown
+- BTC-GBP breakout: PASS, +13.9%, PF 1.40, 11.5% max drawdown
+
+Current live-engine decisions remain authoritative; R7.5 will not create a trade when the base engine is BLOCKED/HOLD.
