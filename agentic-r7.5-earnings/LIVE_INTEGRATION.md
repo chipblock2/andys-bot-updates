@@ -50,3 +50,18 @@ start_r75_shadow.ps1 now idempotently starts:
 - exit_advisor.py
 
 A five-minute Windows watchdog re-runs that start script. A separate daily 03:15 task refreshes maker and taker walk-forward validation files.
+
+
+## Dynamic validation universe
+The daily fee-validation refresh now covers:
+BTC, ETH, DOT, SOL, ADA, UNI, DOGE, CRV, ALGO, LTC, ATOM, LINK and AAVE GBP markets.
+
+The live shadow bridge no longer hard-codes only BTC/ETH. It dynamically loads maker-PASS market/strategy pairs and applies strategy-family compatibility:
+- breakout -> live MOMENTUM/SWING_TREND/MEME_RETEST + breakout location
+- trend -> live MOMENTUM/SWING_TREND
+- meanrev -> live MEAN_REVERSION/FAIR_VALUE_REVERSION
+
+This prevents an unrelated historical strategy family from approving a live signal.
+
+## Exit-price reliability fix
+Held symbols can be absent from the model assets list. Exit advisor/counterfactual pricing therefore uses Coinbase public ticker data directly, with winner-watch/model price only as fallback. When model ATR is absent, the advisor calculates a public 1-hour ATR. Invalid pre-fix shadow state is diagnostic-only and was reset; no Coinbase order was modified.
