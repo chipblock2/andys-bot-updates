@@ -21,3 +21,13 @@ This package cannot place orders, move funds, change risk limits or bypass the e
 
 Test with: python self_test.py
 Expected: R7.5 SELF-TEST PASS
+
+Additional R7.5 profit protection:
+- Fee-aware break-even recommendation after 1.0R.
+- ATR trailing recommendation after 1.5R.
+- Existing stops can only tighten; the policy never loosens protection.
+- Protective exits are costed conservatively using taker fees.
+- Partial-profit splitting remains disabled until it is separately validated.
+
+Account-fee rule:
+R7.5 will not mark a candidate SHADOW_READY when it only has fallback fee assumptions. It requires account-specific Coinbase fee-tier data before readiness.
