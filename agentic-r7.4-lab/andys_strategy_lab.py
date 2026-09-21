@@ -493,7 +493,7 @@ def cmd_scan(args) -> None:
         "mode": "synthetic" if args.synthetic else "public_coinbase_data",
         "granularity_seconds": args.gran,
         "days_requested": args.days,
-        "assumptions": {"cash": args.cash, "fee": args.fee, "slippage": args.slip, "risk_per_trade": args.risk},
+        "assumptions": {"cash": args.cash, "fee": args.fee, "fee_mode": "maker" if args.maker else "manual", "slippage": args.slip, "risk_per_trade": args.risk},
         "results": results,
         "best": results[0],
         "pass_count": sum(1 for r in results if r["verdict"] == "PASS"),
@@ -593,6 +593,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--days", type=int, default=1460)
     parser.add_argument("--cash", type=float, default=1000.0)
     parser.add_argument("--fee", type=float, default=0.006, help="per side; verify actual Coinbase tier")
+    parser.add_argument("--maker", action="store_true", help="use maker-fee assumption instead of --fee")
+    parser.add_argument("--maker-fee", type=float, default=0.0025, help="maker fee per side used with --maker; account tier may differ")
     parser.add_argument("--slip", type=float, default=0.001)
     parser.add_argument("--risk", type=float, default=0.02)
     parser.add_argument("--max-dd", dest="max_dd", type=float, default=0.25)
@@ -604,6 +606,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 if __name__ == "__main__":
     args = build_parser().parse_args()
+    if args.maker:
+        args.fee = args.maker_fee
     if not (0 < args.risk <= 0.10):
         raise SystemExit("--risk must be > 0 and <= 0.10")
     if not (0 <= args.fee < 0.05 and 0 <= args.slip < 0.05):
