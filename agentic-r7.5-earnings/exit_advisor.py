@@ -37,6 +37,25 @@ def candles(product,start,end):
         rows=[x for x in data if isinstance(x,list) and len(x)>=6]
     return rows
 
+def ticker(product):
+    req=urllib.request.Request(f"{API}/products/{product}/ticker",headers={"User-Agent":"AndysBot-R75-ExitAdvisor"})
+    with urllib.request.urlopen(req,timeout=8) as r:
+        d=json.load(r)
+    return {"price":float(d.get("price") or 0),"bid":float(d.get("bid") or 0),"ask":float(d.get("ask") or 0)}
+
+def hourly_atr(product,end,n=14):
+    gran=3600; start=end-40*gran
+    q=urllib.parse.urlencode({"granularity":gran,"start":iso(start),"end":iso(end)})
+    req=urllib.request.Request(f"{API}/products/{product}/candles?{q}",headers={"User-Agent":"AndysBot-R75-ExitAdvisor"})
+    with urllib.request.urlopen(req,timeout=12) as r:data=json.load(r)
+    rows=sorted([x for x in data if isinstance(x,list) and len(x)>=6],key=lambda x:x[0])
+    trs=[]
+    for i,x in enumerate(rows):
+        hi=float(x[2]);lo=float(x[1])
+        prev=float(rows[i-1][4]) if i else float(x[4])
+        trs.append(max(hi-lo,abs(hi-prev),abs(lo-prev)))
+    return sum(trs[-n:])/max(1,len(trs[-n:]))
+
 def save(path,obj):
     raw=json.dumps(obj,indent=2)
     try:
@@ -48,15 +67,23 @@ def once():
     fee=d.get("fee_profile") or {}
     maker=float(fee.get("maker_fee") or .0006);taker=float(fee.get("taker_fee") or .0016)
     now=time.time();rows=[]
+    winners={str(x.get("symbol")):x for x in (lc.get("winner_watch") or []) if isinstance(x,dict)}
     for sym,pos in (lc.get("positions") or {}).items():
         product=str(pos.get("product_id") or f"{sym}-GBP")
         entry=float(pos.get("entry_price") or 0);stop=float(pos.get("stop_price") or 0)
         initial_stop=float(pos.get("model_stop_price") or stop)
         opened=float(pos.get("opened_ts") or now)
         a=assets.get(sym) or {}
-        current=float(a.get("coinbase_price") or a.get("price") or entry)
+        fallback_current=float((winners.get(sym) or {}).get("price") or a.get("coinbase_price") or a.get("price") or entry)
+        try:
+            current=float(ticker(product).get("price") or fallback_current)
+        except Exception:
+            current=fallback_current
         atr_pct=float(a.get("atr_pct") or 0)
         atr_abs=current*atr_pct
+        if atr_abs<=0:
+            try: atr_abs=hourly_atr(product,now)
+            except Exception: atr_abs=max(current*0.01,entry*0.01)
         try:
             cs=candles(product,opened,now)
             highest=max([float(x[2]) for x in cs],default=current)
