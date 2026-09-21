@@ -7,9 +7,11 @@ Writes recommendations only. It has no order/approval/transfer endpoints.
 import json, time, urllib.request
 from pathlib import Path
 from earnings_engine import evaluate_earnings_candidate
+from smart_execution_selector import route as smart_route, DEFAULT_CONFIG as SMART_EXECUTION_CONFIG
 
 ROOT=Path(__file__).resolve().parent
 LAB=ROOT/"state"/"strategy_lab_status.json"
+TAKER_LAB=ROOT/"state"/"strategy_lab_taker_status.json"
 STATUS=ROOT/"state"/"r7_5_live_shadow_status.json"
 AUDIT=ROOT/"state"/"r7_5_live_shadow_audit.jsonl"
 URL="http://127.0.0.1:8787/api/live"
@@ -77,8 +79,12 @@ def book_from_asset(a):
         "market_status":"FULL_TRADING",
     }
 
+def _validation(lab_status,product,strategy):
+    row=next((r for r in (lab_status.get("results") or []) if str(r.get("market") or "").upper()==product.upper() and str(r.get("strategy") or "").lower()==strategy.lower()),None)
+    return {"verdict":(row or {}).get("verdict","UNKNOWN"),"metrics":(row or {}).get("metrics") or {}}
+
 def run_once():
-    d=get_live(); lab=load_json(LAB); cfg=live_config(d); fees=fee_summary(d); port=portfolio(d,cfg)
+    d=get_live(); lab=load_json(LAB); taker_lab=load_json(TAKER_LAB); cfg=live_config(d); fees=fee_summary(d); port=portfolio(d,cfg)
     rows=[]
     for product,strategy in CANDIDATES:
         sym=product.split("-")[0]; a=(d.get("assets") or {}).get(sym) or {}
@@ -91,6 +97,16 @@ def run_once():
         base_action=str(a.get("action") or "HOLD").upper()
         row["base_action"]=base_action
         row["base_reason"]=a.get("reason") or ""
+        row["smart_execution"]=smart_route(row,a,d.get("market_maker_lab") or {},SMART_EXECUTION_CONFIG)
+        row["execution_validation"]={"maker":_validation(lab,product,strategy),"taker":_validation(taker_lab,product,strategy)}
+        if row.get("state")=="SHADOW_READY" and row["smart_execution"].get("route")=="TAKER_NOW" and row["execution_validation"]["taker"].get("verdict")!="PASS":
+            row["state"]="WATCH"
+            row["execution"]={"action":"NO_ORDER","reason":"TAKER_NOW strategy did not PASS taker-fee walk-forward"}
+            row["reasons"]=list(dict.fromkeys(row.get("reasons",[])+["taker-fee walk-forward did not PASS"]))
+        if row.get("state")=="SHADOW_READY" and row["smart_execution"].get("route")!="TAKER_NOW":
+            row["state"]="WATCH"
+            row["execution"]={"action":"NO_ORDER","reason":"smart execution selector says "+str(row["smart_execution"].get("route"))}
+            row["reasons"]=list(dict.fromkeys(row.get("reasons",[])+["smart execution: "+str(row["smart_execution"].get("reason") or row["smart_execution"].get("route"))]))
         if base_action not in {"BUY","LONG","TRADE"}:
             row["state"]="WATCH" if row["health"]["state"]!="OFF" else "REJECT"
             row["execution"]={"action":"NO_ORDER","reason":"base live engine is not BUY/LONG/TRADE"}
