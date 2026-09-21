@@ -329,9 +329,16 @@ def evaluate_earnings_candidate(*, product: str, strategy: str, signal_score: fl
     liquidity = liquidity_gate(book, provisional, config)
     edge = edge_gate(expected_return, fee, liquidity, config)
     sizing = adaptive_size(signal_score, health, regime, liquidity, edge, portfolio, config)
-    execution = maker_first_plan("BUY", liquidity, edge, sizing["amount_gbp"], config, fee)
+    fee_ready = (not bool(config.get("require_account_fees_for_ready", True))) or fee.source != "config_fallback"
+    execution = maker_first_plan(
+        "BUY", liquidity, edge,
+        sizing["amount_gbp"] if fee_ready else 0.0,
+        config, fee,
+    )
 
     reasons = []
+    if not fee_ready:
+        reasons.append("account-specific Coinbase fee tier is unavailable")
     if health["state"] != "READY":
         reasons.append(f"strategy health is {health['state']}")
     if not regime["allowed"]:
