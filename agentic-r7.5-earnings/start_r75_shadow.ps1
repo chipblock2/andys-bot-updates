@@ -5,7 +5,8 @@ $Py='C:\Users\Andy\AppData\Local\Programs\Python\Python312\pythonw.exe'
 $jobs=@(
   @{Name='R7.5 bridge'; File='live_shadow_bridge.py'},
   @{Name='R7.5 counterfactual'; File='execution_counterfactual.py'},
-  @{Name='R7.5 exit advisor'; File='exit_advisor.py'}
+  @{Name='R7.5 exit advisor'; File='exit_advisor.py'},
+  @{Name='R7.5 exit counterfactual'; File='exit_counterfactual.py'}
 )
 foreach($job in $jobs){
   $target=Join-Path $Here $job.File
