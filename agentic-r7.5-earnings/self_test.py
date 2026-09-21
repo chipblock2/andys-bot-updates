@@ -68,6 +68,16 @@ candidate3 = evaluate_earnings_candidate(
 assert candidate3["state"] != "SHADOW_READY"
 assert not candidate3["liquidity"]["allowed"]
 
+# Missing account fee summary must prevent readiness when configured.
+candidate4 = evaluate_earnings_candidate(
+    product="ETH-GBP", strategy="breakout", signal_score=95,
+    expected_return=0.04, asset=asset, snapshot=snapshot,
+    lab_status=lab, book=book, fee_summary=None,
+    portfolio=portfolio, config=cfg,
+)
+assert candidate4["state"] != "SHADOW_READY", candidate4
+assert candidate4["execution"]["action"] == "NO_ORDER", candidate4
+
 print("R7.5 SELF-TEST PASS")
 print("current ETH breakout health:", h)
 print("healthy shadow proposal:", candidate2["sizing"], candidate2["execution"])
