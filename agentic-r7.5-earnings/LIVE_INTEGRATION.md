@@ -65,3 +65,33 @@ This prevents an unrelated historical strategy family from approving a live sign
 
 ## Exit-price reliability fix
 Held symbols can be absent from the model assets list. Exit advisor/counterfactual pricing therefore uses Coinbase public ticker data directly, with winner-watch/model price only as fallback. When model ATR is absent, the advisor calculates a public 1-hour ATR. Invalid pre-fix shadow state is diagnostic-only and was reset; no Coinbase order was modified.
+
+
+## Live-money audit hardening
+
+R7.5 now includes a read-only live-order auditor and a stricter staged AUTO-BUY gate.
+
+The staged gate:
+- is pure/read-only until the existing live AUTO-BUY path calls it
+- requires fresh SHADOW_READY + TAKER_NOW + taker-fee PASS for a covered product
+- fails closed if a product has maker PASS validation but its expected bridge row is temporarily missing
+- leaves products with no PASS validation under the pre-existing live gates
+- writes best-effort allow/block audit records without touching order submission
+
+The currently running server was deliberately not restarted while real-money AUTO BUY was active; the compiled gate is staged on disk for the next normal server restart.
+
+The read-only live-order auditor:
+- baselines pre-existing live orders
+- watches future live positions/orders from /api/live
+- records whether the observed order was supported by the contemporaneous R7.5 state
+- cannot preview, submit, cancel or edit orders
+
+## First live outcome after R7.5 research integration
+
+On 21 September 2026:
+- LTC closed at target near GBP46.445 for about +GBP0.52 realised.
+- SOL closed at target GBP88.57 for about +GBP0.59 realised.
+- Day realised P/L reached about +GBP1.84.
+- Lifetime realised P/L reached about +GBP1.57.
+
+The corrected SOL exit counterfactual completed without triggering the tighter shadow stop, so the actual target exit won and no evidence yet supports automatically editing live brackets.
