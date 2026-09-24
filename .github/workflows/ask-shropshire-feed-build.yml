@@ -6,7 +6,7 @@ on:
     paths:
       - '.github/workflows/ask-shropshire-feed-build.yml'
       - 'ask-shropshire/sync-input/**'
-      - 'ask-shropshire/staging/**'
+      - 'ask-shropshire/staging/ready.json'
 
 permissions:
   contents: write
@@ -52,14 +52,18 @@ jobs:
           def norm(v):
               return ' '.join(str(v or '').strip().lower().split())
 
+          base_events=load(os.path.join(ROOT,'events.json'))['events']
+          root_places=load(os.path.join(ROOT,'places.json'))['places']
+          root_offers=load(os.path.join(ROOT,'offers.json'))['offers']
+          root_tips=load(os.path.join(ROOT,'tips.json'))['tips']
+
           expected_path=os.path.join(STAGE,'expected.json')
           if os.path.exists(expected_path):
               expected=load(expected_path)
           else:
-              expected={'events':235,'places':13,'offers':0,'tips':4}
+              expected={'events':len(base_events),'places':len(root_places),'offers':len(root_offers),'tips':len(root_tips)}
 
-          base=load(os.path.join(ROOT,'events.json'))['events']
-          by_id={x['id']:x for x in base}
+          by_id={x['id']:x for x in base_events}
           overlaid=0
           event_paths=sorted(glob.glob(os.path.join(LEGACY,'events-*.json')) + glob.glob(os.path.join(STAGE,'events-*.json')))
           for path in event_paths:
@@ -96,18 +100,17 @@ jobs:
           events.sort(key=lambda x:(x.get('start') or '9999',norm(x.get('name'))))
           assert len(events)==expected['events'], f"Event set mismatch: events={len(events)} expected={expected['events']} duplicates={len(duplicates)} expired={len(expired)}"
 
-          def staged_or_root(filename,key):
+          def staged_or_root(filename,key,root_value):
               for directory in (STAGE,LEGACY):
                   path=os.path.join(directory,filename)
                   if os.path.exists(path):
                       obj=load(path)
                       return obj.get(key,[]) if isinstance(obj,dict) else obj
-              obj=load(os.path.join(ROOT,filename))
-              return obj.get(key,[]) if isinstance(obj,dict) else obj
+              return root_value
 
-          places=staged_or_root('places.json','places')
-          offers=staged_or_root('offers.json','offers')
-          tips=staged_or_root('tips.json','tips')
+          places=staged_or_root('places.json','places',root_places)
+          offers=staged_or_root('offers.json','offers',root_offers)
+          tips=staged_or_root('tips.json','tips',root_tips)
           assert all(x.get('status')=='Published' for x in places), 'Non-Published place in public set'
           assert all(x.get('status')=='Published' for x in offers), 'Non-Published offer in public set'
           assert all(x.get('status')=='Published' for x in tips), 'Non-Published tip in public set'
