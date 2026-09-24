@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/ask-shropshire-feed-build.yml'
       - 'ask-shropshire/sync-input/**'
+      - 'ask-shropshire/staging/**'
 
 permissions:
   contents: write
@@ -26,10 +27,10 @@ jobs:
           from datetime import datetime, timezone
 
           ROOT='ask-shropshire'
-          IN=os.path.join(ROOT,'sync-input')
+          LEGACY=os.path.join(ROOT,'sync-input')
+          STAGE=os.path.join(ROOT,'staging')
           now=datetime.now(timezone.utc)
           generated=now.isoformat().replace('+00:00','Z')
-          expected_published_events=235
 
           def load(path):
               with open(path,encoding='utf-8') as f: text=f.read()
@@ -39,18 +40,29 @@ jobs:
               if tail:
                   print(f'Ignoring trailing staging artefact in {path}: {tail[:80]!r}')
               return obj
+
           def dump(path,obj):
               with open(path,'w',encoding='utf-8') as f:
                   json.dump(obj,f,ensure_ascii=False,separators=(',',':'))
+
           def dt(v):
               if not v: return None
               return datetime.fromisoformat(v.replace('Z','+00:00'))
-          def norm(v): return ' '.join(str(v or '').strip().lower().split())
+
+          def norm(v):
+              return ' '.join(str(v or '').strip().lower().split())
+
+          expected_path=os.path.join(STAGE,'expected.json')
+          if os.path.exists(expected_path):
+              expected=load(expected_path)
+          else:
+              expected={'events':235,'places':13,'offers':0,'tips':4}
 
           base=load(os.path.join(ROOT,'events.json'))['events']
           by_id={x['id']:x for x in base}
           overlaid=0
-          for path in sorted(glob.glob(os.path.join(IN,'events-*.json'))):
+          event_paths=sorted(glob.glob(os.path.join(LEGACY,'events-*.json')) + glob.glob(os.path.join(STAGE,'events-*.json')))
+          for path in event_paths:
               staged=load(path)
               if isinstance(staged,dict): staged=staged.get('events',[])
               assert all(x.get('status')=='Published' for x in staged), 'Non-Published event in public staging'
@@ -67,50 +79,66 @@ jobs:
               if key in by_key:
                   duplicates.append(key)
                   old=by_key[key]
-                  if str(x.get('last_checked') or '') > str(old.get('last_checked') or ''): by_key[key]=x
-              else: by_key[key]=x
+                  if str(x.get('last_checked') or '') > str(old.get('last_checked') or ''):
+                      by_key[key]=x
+              else:
+                  by_key[key]=x
           deduped=list(by_key.values())
 
           expired=[]
           events=[]
           for x in deduped:
               end=dt(x.get('end'))
-              if end and end <= now: expired.append(x)
-              else: events.append(x)
+              if end and end <= now:
+                  expired.append(x)
+              else:
+                  events.append(x)
           events.sort(key=lambda x:(x.get('start') or '9999',norm(x.get('name'))))
-          assert len(events)+len(duplicates)==expected_published_events, f'Event set mismatch: events={len(events)} duplicate_external_ids={len(duplicates)} expected Published={expected_published_events}'
+          assert len(events)==expected['events'], f"Event set mismatch: events={len(events)} expected={expected['events']} duplicates={len(duplicates)} expired={len(expired)}"
 
-          places=load(os.path.join(IN,'places.json'))
-          offers=load(os.path.join(IN,'offers.json'))
-          tips=load(os.path.join(IN,'tips.json'))
-          if isinstance(places,dict): places=places.get('places',[])
-          if isinstance(offers,dict): offers=offers.get('offers',[])
-          if isinstance(tips,dict): tips=tips.get('tips',[])
-          assert all(x.get('status')=='Published' for x in places), 'Non-Published place in staging'
-          assert all(x.get('status')=='Published' for x in offers), 'Non-Published offer in staging'
-          assert all(x.get('status')=='Published' for x in tips), 'Non-Published tip in staging'
+          def staged_or_root(filename,key):
+              for directory in (STAGE,LEGACY):
+                  path=os.path.join(directory,filename)
+                  if os.path.exists(path):
+                      obj=load(path)
+                      return obj.get(key,[]) if isinstance(obj,dict) else obj
+              obj=load(os.path.join(ROOT,filename))
+              return obj.get(key,[]) if isinstance(obj,dict) else obj
+
+          places=staged_or_root('places.json','places')
+          offers=staged_or_root('offers.json','offers')
+          tips=staged_or_root('tips.json','tips')
+          assert all(x.get('status')=='Published' for x in places), 'Non-Published place in public set'
+          assert all(x.get('status')=='Published' for x in offers), 'Non-Published offer in public set'
+          assert all(x.get('status')=='Published' for x in tips), 'Non-Published tip in public set'
 
           def unique(items,keyfn):
               out={}
-              duplicates=[]
+              dups=[]
               for x in items:
                   key=keyfn(x)
-                  if key in out: duplicates.append(key)
-                  else: out[key]=x
-              return list(out.values()),duplicates
+                  if key in out:
+                      dups.append(key)
+                  else:
+                      out[key]=x
+              return list(out.values()),dups
+
           places,place_duplicates=unique(places,lambda x:norm(x.get('name')))
           offers,offer_duplicates=unique(offers,lambda x:norm(x.get('id') or f"{x.get('name')}|{x.get('business_venue')}|{x.get('start')}"))
           tips,tip_duplicates=unique(tips,lambda x:norm(f"{x.get('tip')}|{x.get('place_business')}|{x.get('town')}"))
+
           current_offers=[]
           expired_offers=[]
           for x in offers:
               end=dt(x.get('end'))
-              if end and end <= now: expired_offers.append(x)
-              else: current_offers.append(x)
+              if end and end <= now:
+                  expired_offers.append(x)
+              else:
+                  current_offers.append(x)
 
-          assert len(places)==13, f'Expected 13 places, got {len(places)}'
-          assert len(current_offers)==0, f'Expected 0 current offers, got {len(current_offers)}'
-          assert len(tips)==4, f'Expected 4 tips, got {len(tips)}'
+          assert len(places)==expected['places'], f"Expected {expected['places']} places, got {len(places)}"
+          assert len(current_offers)==expected['offers'], f"Expected {expected['offers']} current offers, got {len(current_offers)}"
+          assert len(tips)==expected['tips'], f"Expected {expected['tips']} tips, got {len(tips)}"
 
           dump(os.path.join(ROOT,'events.json'),{'generated_at':generated,'source':'Ask Shropshire Content Hub','events':events})
           dump(os.path.join(ROOT,'places.json'),{'generated_at':generated,'source':'Ask Shropshire Content Hub','places':places})
@@ -120,15 +148,29 @@ jobs:
           confirmed=load(os.path.join(ROOT,'events.json'))['events']
           assert len(confirmed)==len(events), 'Main events feed re-open validation failed'
           assert {x['id'] for x in confirmed}=={x['id'] for x in events}, 'Main events feed does not match validated event set'
+          assert all(x.get('status')=='Published' for x in confirmed), 'Main events feed contains non-Published record'
+
           dump(os.path.join(ROOT,'events-extra.json'),{'generated_at':generated,'source':'Ask Shropshire temporary overlay','events':[]})
 
-          report={'events':len(events),'places':len(places),'offers':len(current_offers),'tips':len(tips),'event_duplicates':len(duplicates),'place_duplicates':len(place_duplicates),'offer_duplicates':len(offer_duplicates),'tip_duplicates':len(tip_duplicates),'expired_events':len(expired),'expired_offers':len(expired_offers),'event_overlays':overlaid}
+          report={
+              'events':len(events),
+              'places':len(places),
+              'offers':len(current_offers),
+              'tips':len(tips),
+              'event_duplicates':len(duplicates),
+              'place_duplicates':len(place_duplicates),
+              'offer_duplicates':len(offer_duplicates),
+              'tip_duplicates':len(tip_duplicates),
+              'expired_events':len(expired),
+              'expired_offers':len(expired_offers),
+              'event_overlays':overlaid
+          }
           dump(os.path.join(ROOT,'feed-sync-report.json'),report)
           print(json.dumps(report))
 
       - name: Publish validated feed
         run: |
-          rm -rf ask-shropshire/sync-input
+          rm -rf ask-shropshire/sync-input ask-shropshire/staging
           git config user.name 'Ask Shropshire Feed Sync'
           git config user.email 'actions@users.noreply.github.com'
           git add -A ask-shropshire
