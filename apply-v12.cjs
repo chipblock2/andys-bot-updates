@@ -38,7 +38,8 @@ if (process.env.DEPLOYBRIDGE_APPLY_V12 === '1' && process.env.DEPLOYBRIDGE_PATCH
   console.log(`[DeployBridge] v1.2.0 patch verified and applied (${patchDigest})`);
   console.log(`[DeployBridge] v1.2.0 health hotfix verified (${healthDigest})`);
 
-  if (process.env.PORT) {
+  const isServerRuntime = Boolean(process.argv[1] && /server\.js$/.test(process.argv[1]));
+  if (process.env.PORT && isServerRuntime) {
     const port = process.env.PORT;
     const base = `http://127.0.0.1:${port}`;
     setTimeout(async () => {
