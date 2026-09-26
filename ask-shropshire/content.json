@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 1,
-  "syncedAt": "2026-09-19T18:01:29.791Z",
+  "schemaVersion": 2,
+  "syncedAt": "2026-09-26T10:35:00.000Z",
   "source": "Ask Shropshire Content Hub (Airtable)",
   "events": [
     {
@@ -6404,6 +6404,480 @@
       "weatherFit": "Indoor fallback",
       "typicalDurationMinutes": 150,
       "sameDayFriendly": true
+    }
+  ],
+  "valueMeals": [
+    {
+      "id": "recYdMvST5g9x61YZ",
+      "name": "Strip Dog",
+      "status": "Published",
+      "business": "Frydays Oakengates",
+      "town": "Oakengates",
+      "postcode": "TF2 6ER",
+      "price": 5.99,
+      "priceBand": "£5–£7.50",
+      "mealTypes": [
+        "Lunch",
+        "Dinner"
+      ],
+      "foodTypes": [
+        "Chicken"
+      ],
+      "dietary": [],
+      "collection": true,
+      "delivery": true,
+      "eatIn": null,
+      "deliveryMethod": [
+        "Direct"
+      ],
+      "deliveryArea": "TF1, TF10, TF11, TF12, TF2, TF3, TF4, TF5, TF6, TF7, TF8",
+      "orderUrl": "https://frydaysoakengates.co.uk/",
+      "phone": null,
+      "description": "Crispy chicken in a hot dog bun with melted cheese, smoky chipotle sauce and chips.",
+      "sourceName": "Frydays official menu",
+      "sourceUrl": "https://frydaysoakengates.co.uk/",
+      "lastChecked": "2026-09-26T08:39:00.000Z",
+      "freshness": "Fresh",
+      "hygieneRating": 4,
+      "hygieneRatingDate": "2025-03-13",
+      "reviewCount": 0,
+      "averageValueRating": null,
+      "averageTasteRating": null,
+      "averagePortionRating": null,
+      "wouldBuyAgainCount": 0,
+      "verifiedReviewCount": 0,
+      "photoUrl": null,
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "reclAZDvXn0DGlj8V",
+      "name": "Large Sausage Special",
+      "status": "Published",
+      "business": "Madeley Fish Bar",
+      "town": "Madeley",
+      "postcode": "TF7 5AR",
+      "price": 6.5,
+      "priceBand": "£5–£7.50",
+      "mealTypes": [
+        "Lunch",
+        "Dinner"
+      ],
+      "foodTypes": [
+        "Fish & Chips"
+      ],
+      "dietary": [],
+      "collection": true,
+      "delivery": true,
+      "eatIn": null,
+      "deliveryMethod": [
+        "Direct"
+      ],
+      "deliveryArea": "TF3, TF4, TF7, TF8",
+      "orderUrl": "https://madeley-fish-bar.co.uk/",
+      "phone": null,
+      "description": "Large sausage served with chips and a choice of sauce.",
+      "sourceName": "Madeley Fish Bar official menu",
+      "sourceUrl": "https://madeley-fish-bar.co.uk/",
+      "lastChecked": "2026-09-26T08:39:00.000Z",
+      "freshness": "Fresh",
+      "hygieneRating": 5,
+      "hygieneRatingDate": "2025-02-11",
+      "reviewCount": 0,
+      "averageValueRating": null,
+      "averageTasteRating": null,
+      "averagePortionRating": null,
+      "wouldBuyAgainCount": 0,
+      "verifiedReviewCount": 0,
+      "photoUrl": null,
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "reclJ4pCq3NfTYsUI",
+      "name": "Chicken Fillet Burger Meal",
+      "status": "Published",
+      "business": "Sizzlin Telford",
+      "town": "Wellington",
+      "postcode": "TF1 1JW",
+      "price": 6.99,
+      "priceBand": "£5–£7.50",
+      "mealTypes": [
+        "Dinner"
+      ],
+      "foodTypes": [
+        "Burger",
+        "Chicken"
+      ],
+      "dietary": [],
+      "collection": true,
+      "delivery": true,
+      "eatIn": null,
+      "deliveryMethod": [
+        "Direct"
+      ],
+      "deliveryArea": null,
+      "orderUrl": "https://sizzlintelford.co.uk/",
+      "phone": "01952 242255",
+      "description": "Chicken fillet burger served with fries and a 330ml can of soft drink.",
+      "sourceName": "Sizzlin Telford official menu",
+      "sourceUrl": "https://sizzlintelford.co.uk/",
+      "lastChecked": "2026-09-26T08:39:00.000Z",
+      "freshness": "Fresh",
+      "hygieneRating": null,
+      "hygieneRatingDate": null,
+      "reviewCount": 0,
+      "averageValueRating": null,
+      "averageTasteRating": null,
+      "averagePortionRating": null,
+      "wouldBuyAgainCount": 0,
+      "verifiedReviewCount": 0,
+      "photoUrl": null,
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "recoOuogGT8Qqla4N",
+      "name": "Mini Fish Lunch Box",
+      "status": "Published",
+      "business": "Ocean Fish Bar",
+      "town": "St George's",
+      "postcode": "TF2 9JP",
+      "price": 7,
+      "priceBand": "£5–£7.50",
+      "mealTypes": [
+        "Lunch",
+        "Dinner"
+      ],
+      "foodTypes": [
+        "Fish & Chips"
+      ],
+      "dietary": [],
+      "collection": true,
+      "delivery": true,
+      "eatIn": null,
+      "deliveryMethod": [
+        "Direct"
+      ],
+      "deliveryArea": null,
+      "orderUrl": "https://oceanfishbartelford.co.uk/",
+      "phone": null,
+      "description": "Mini fish and chips with curry, peas, gravy or beans.",
+      "sourceName": "Ocean Fish Bar official menu",
+      "sourceUrl": "https://oceanfishbartelford.co.uk/",
+      "lastChecked": "2026-09-26T08:39:00.000Z",
+      "freshness": "Fresh",
+      "hygieneRating": null,
+      "hygieneRatingDate": null,
+      "reviewCount": 0,
+      "averageValueRating": null,
+      "averageTasteRating": null,
+      "averagePortionRating": null,
+      "wouldBuyAgainCount": 0,
+      "verifiedReviewCount": 0,
+      "photoUrl": null,
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "recv1t9LfQqCLF7se",
+      "name": "Veggie Burger Meal (Quarter)",
+      "status": "Published",
+      "business": "Chick Ville",
+      "town": "Telford",
+      "postcode": "TF4 2EX",
+      "price": 7.49,
+      "priceBand": "£5–£7.50",
+      "mealTypes": [
+        "Dinner"
+      ],
+      "foodTypes": [
+        "Burger",
+        "Vegetarian"
+      ],
+      "dietary": [
+        "Vegetarian"
+      ],
+      "collection": true,
+      "delivery": true,
+      "eatIn": null,
+      "deliveryMethod": [
+        "Direct"
+      ],
+      "deliveryArea": null,
+      "orderUrl": "https://www.chickvilletelford.co.uk/Home",
+      "phone": null,
+      "description": "Quarter-size veggie burger meal.",
+      "sourceName": "Chick Ville official menu",
+      "sourceUrl": "https://chickvilletelford.co.uk/Menu/",
+      "lastChecked": "2026-09-26T08:39:00.000Z",
+      "freshness": "Fresh",
+      "hygieneRating": null,
+      "hygieneRatingDate": null,
+      "reviewCount": 0,
+      "averageValueRating": null,
+      "averageTasteRating": null,
+      "averagePortionRating": null,
+      "wouldBuyAgainCount": 0,
+      "verifiedReviewCount": 0,
+      "photoUrl": null,
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "recKGevyOo0J9oO4L",
+      "name": "Mixed Kebab Wrap Meal",
+      "status": "Published",
+      "business": "Frydays Oakengates",
+      "town": "Oakengates",
+      "postcode": "TF2 6ER",
+      "price": 7.99,
+      "priceBand": "£7.51–£10",
+      "mealTypes": [
+        "Dinner"
+      ],
+      "foodTypes": [
+        "Kebab"
+      ],
+      "dietary": [],
+      "collection": true,
+      "delivery": true,
+      "eatIn": null,
+      "deliveryMethod": [
+        "Direct"
+      ],
+      "deliveryArea": "TF1, TF10, TF11, TF12, TF2, TF3, TF4, TF5, TF6, TF7, TF8",
+      "orderUrl": "https://frydaysoakengates.co.uk/",
+      "phone": null,
+      "description": "Mixed meat wrap with chips, salad and sauce.",
+      "sourceName": "Frydays official menu",
+      "sourceUrl": "https://frydaysoakengates.co.uk/",
+      "lastChecked": "2026-09-26T08:39:00.000Z",
+      "freshness": "Fresh",
+      "hygieneRating": 4,
+      "hygieneRatingDate": "2025-03-13",
+      "reviewCount": 0,
+      "averageValueRating": null,
+      "averageTasteRating": null,
+      "averagePortionRating": null,
+      "wouldBuyAgainCount": 0,
+      "verifiedReviewCount": 0,
+      "photoUrl": null,
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "recIuWmJceKjOazQp",
+      "name": "Lunch Box",
+      "status": "Published",
+      "business": "Stanwyck Fish Bar",
+      "town": "Telford",
+      "postcode": "TF7 4JL",
+      "price": 8,
+      "priceBand": "£7.51–£10",
+      "mealTypes": [
+        "Lunch"
+      ],
+      "foodTypes": [
+        "Fish & Chips"
+      ],
+      "dietary": [],
+      "collection": true,
+      "delivery": true,
+      "eatIn": null,
+      "deliveryMethod": [
+        "Direct"
+      ],
+      "deliveryArea": "TF3, TF4, TF7",
+      "orderUrl": "https://stanwyckfishbar.co.uk/",
+      "phone": null,
+      "description": "Mini fish, small sausage and chips with a choice of curry, peas, gravy or beans.",
+      "sourceName": "Stanwyck Fish Bar official menu",
+      "sourceUrl": "https://stanwyckfishbar.co.uk/",
+      "lastChecked": "2026-09-26T08:39:00.000Z",
+      "freshness": "Fresh",
+      "hygieneRating": 4,
+      "hygieneRatingDate": "2025-03-04",
+      "reviewCount": 0,
+      "averageValueRating": null,
+      "averageTasteRating": null,
+      "averagePortionRating": null,
+      "wouldBuyAgainCount": 0,
+      "verifiedReviewCount": 0,
+      "photoUrl": null,
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "recIVmdtgEHbkf0ef",
+      "name": "Ocean Value Box",
+      "status": "Published",
+      "business": "Ocean Fish Bar",
+      "town": "St George's",
+      "postcode": "TF2 9JP",
+      "price": 8,
+      "priceBand": "£7.51–£10",
+      "mealTypes": [
+        "Lunch",
+        "Dinner"
+      ],
+      "foodTypes": [
+        "Fish & Chips"
+      ],
+      "dietary": [],
+      "collection": true,
+      "delivery": true,
+      "eatIn": null,
+      "deliveryMethod": [
+        "Direct"
+      ],
+      "deliveryArea": null,
+      "orderUrl": "https://oceanfishbartelford.co.uk/",
+      "phone": null,
+      "description": "Mini fish, sausage and chips with curry, peas, gravy or beans.",
+      "sourceName": "Ocean Fish Bar official menu",
+      "sourceUrl": "https://oceanfishbartelford.co.uk/",
+      "lastChecked": "2026-09-26T08:39:00.000Z",
+      "freshness": "Fresh",
+      "hygieneRating": null,
+      "hygieneRatingDate": null,
+      "reviewCount": 0,
+      "averageValueRating": null,
+      "averageTasteRating": null,
+      "averagePortionRating": null,
+      "wouldBuyAgainCount": 0,
+      "verifiedReviewCount": 0,
+      "photoUrl": null,
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "recPodKqzzbyjbTit",
+      "name": "Pie Box Meal",
+      "status": "Published",
+      "business": "Madeley Fish Bar",
+      "town": "Madeley",
+      "postcode": "TF7 5AR",
+      "price": 8.2,
+      "priceBand": "£7.51–£10",
+      "mealTypes": [
+        "Lunch",
+        "Dinner"
+      ],
+      "foodTypes": [
+        "Other"
+      ],
+      "dietary": [],
+      "collection": true,
+      "delivery": true,
+      "eatIn": null,
+      "deliveryMethod": [
+        "Direct"
+      ],
+      "deliveryArea": "TF3, TF4, TF7, TF8",
+      "orderUrl": "https://madeley-fish-bar.co.uk/",
+      "phone": null,
+      "description": "Pie served with chips and a choice of sauce.",
+      "sourceName": "Madeley Fish Bar official menu",
+      "sourceUrl": "https://madeley-fish-bar.co.uk/",
+      "lastChecked": "2026-09-26T08:39:00.000Z",
+      "freshness": "Fresh",
+      "hygieneRating": 5,
+      "hygieneRatingDate": "2025-02-11",
+      "reviewCount": 0,
+      "averageValueRating": null,
+      "averageTasteRating": null,
+      "averagePortionRating": null,
+      "wouldBuyAgainCount": 0,
+      "verifiedReviewCount": 0,
+      "photoUrl": null,
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "recUC9wwZgL44o579",
+      "name": "Mini Fish with Chips",
+      "status": "Published",
+      "business": "Cod Frydays",
+      "town": "Telford",
+      "postcode": "TF3 1LP",
+      "price": 8.5,
+      "priceBand": "£7.51–£10",
+      "mealTypes": [
+        "Lunch",
+        "Dinner"
+      ],
+      "foodTypes": [
+        "Fish & Chips"
+      ],
+      "dietary": [],
+      "collection": true,
+      "delivery": true,
+      "eatIn": null,
+      "deliveryMethod": [
+        "Direct"
+      ],
+      "deliveryArea": "TF2, TF3, TF4, TF7, TF8",
+      "orderUrl": "https://codfrydays.co.uk/",
+      "phone": "01952 596408",
+      "description": "Mini fish with chips, sauce in a tray and a can of pop or bottle of water.",
+      "sourceName": "Cod Frydays official menu",
+      "sourceUrl": "https://codfrydays.co.uk/",
+      "lastChecked": "2026-09-26T08:39:00.000Z",
+      "freshness": "Fresh",
+      "hygieneRating": 3,
+      "hygieneRatingDate": "2025-08-27",
+      "reviewCount": 0,
+      "averageValueRating": null,
+      "averageTasteRating": null,
+      "averagePortionRating": null,
+      "wouldBuyAgainCount": 0,
+      "verifiedReviewCount": 0,
+      "photoUrl": null,
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "recxMibSiQloJ4Pnq",
+      "name": "Original Lunch Box",
+      "status": "Published",
+      "business": "The Big Blue Fish Bar",
+      "town": "Telford",
+      "postcode": "TF1 6XQ",
+      "price": 8.99,
+      "priceBand": "£7.51–£10",
+      "mealTypes": [
+        "Lunch"
+      ],
+      "foodTypes": [
+        "Fish & Chips"
+      ],
+      "dietary": [],
+      "collection": true,
+      "delivery": true,
+      "eatIn": null,
+      "deliveryMethod": [
+        "Just Eat"
+      ],
+      "deliveryArea": null,
+      "orderUrl": "https://www.just-eat.co.uk/restaurants-the-big-blue-hadley/menu",
+      "phone": null,
+      "description": "Small sausage, cod bite, small chips and small sauce.",
+      "sourceName": "Just Eat menu",
+      "sourceUrl": "https://www.just-eat.co.uk/restaurants-the-big-blue-hadley/menu",
+      "lastChecked": "2026-09-26T08:39:00.000Z",
+      "freshness": "Fresh",
+      "hygieneRating": 5,
+      "hygieneRatingDate": "2025-02-21",
+      "reviewCount": 0,
+      "averageValueRating": null,
+      "averageTasteRating": null,
+      "averagePortionRating": null,
+      "wouldBuyAgainCount": 0,
+      "verifiedReviewCount": 0,
+      "photoUrl": null,
+      "latitude": null,
+      "longitude": null
     }
   ]
 }
