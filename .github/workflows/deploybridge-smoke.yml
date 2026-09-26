@@ -1,0 +1,69 @@
+name: DeployBridge smoke test
+
+on:
+  push:
+    branches:
+      - deploybridge-v1
+    paths:
+      - ".github/workflows/deploybridge-smoke.yml"
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify public service
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://deploybridge-ai.onrender.com"
+
+          echo "== health =="
+          curl --fail --silent --show-error "$BASE/health" | tee /tmp/health.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open("/tmp/health.json"))
+          assert d["ok"] is True
+          assert d["service"]=="deploybridge-ai"
+          assert d["version"]=="1.2.0"
+          assert d["auth"]=="oauth-pkce"
+          print("health ok")
+          PY
+
+          echo "== oauth metadata =="
+          curl --fail --silent --show-error "$BASE/.well-known/oauth-authorization-server" | tee /tmp/oauth.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open("/tmp/oauth.json"))
+          assert d["authorization_endpoint"].endswith("/oauth/authorize")
+          assert d["token_endpoint"].endswith("/oauth/token")
+          assert d["registration_endpoint"].endswith("/oauth/register")
+          assert d["userinfo_endpoint"].endswith("/oauth/userinfo")
+          scopes=set(d["scopes_supported"])
+          assert {"openid","email","deploybridge"} <= scopes
+          assert "S256" in d["code_challenge_methods_supported"]
+          print("oauth metadata ok")
+          PY
+
+          echo "== protected resource metadata =="
+          curl --fail --silent --show-error "$BASE/.well-known/oauth-protected-resource" | tee /tmp/resource.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open("/tmp/resource.json"))
+          assert d["resource"].endswith("/mcp")
+          assert {"openid","email","deploybridge"} <= set(d["scopes_supported"])
+          print("resource metadata ok")
+          PY
+
+          echo "== challenge is fail-closed until portal token is configured =="
+          code=$(curl --silent --output /tmp/challenge.txt --write-out "%{http_code}" "$BASE/.well-known/openai-apps-challenge")
+          test "$code" = "404"
+          test "$(cat /tmp/challenge.txt)" = "Not configured"
+          echo "challenge readiness ok"
+
+          echo "== MCP requires authentication =="
+          code=$(curl --silent --output /tmp/mcp.txt --write-out "%{http_code}" -X POST "$BASE/mcp" -H "Content-Type: application/json" -H "Accept: application/json, text/event-stream" --data '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"deploybridge-smoke","version":"1.0"}}}')
+          test "$code" = "401"
+          echo "MCP auth protection ok"
+
+          echo "All public DeployBridge v1.2 smoke checks passed."
