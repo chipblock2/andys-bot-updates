@@ -1,10 +1,40 @@
 import express from "express";
 import crypto from "crypto";
+import Stripe from "stripe";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { z } from "zod";
 
 const app = express();
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || "";
+const PRO_PRICE_ID = process.env.KEEPGOING_PRO_PRICE_ID || "price_1UJy24B86Ss16l9WEsqSRxh1";
+const BUSINESS_PRICE_ID = process.env.KEEPGOING_BUSINESS_PRICE_ID || "price_1UJy26B86Ss16l9W8id4FSsw";
+
+app.post("/stripe/webhook", express.raw({ type: "application/json" }), async (req, res) => {
+  if (!stripe || !STRIPE_WEBHOOK_SECRET) return res.status(503).send("Stripe webhook not configured");
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, req.headers["stripe-signature"], STRIPE_WEBHOOK_SECRET);
+  } catch (error) {
+    return res.status(400).send("Invalid webhook signature");
+  }
+
+  const relevant = new Set([
+    "checkout.session.completed",
+    "customer.subscription.created",
+    "customer.subscription.updated",
+    "customer.subscription.deleted",
+    "invoice.paid",
+    "invoice.payment_failed"
+  ]);
+
+  if (relevant.has(event.type)) {
+    console.log("stripe_event", event.type, event.data?.object?.id || "");
+  }
+  return res.json({ received: true });
+});
+
 app.use(express.json({ limit: "256kb" }));
 
 const PORT = Number(process.env.PORT || 10000);
@@ -198,6 +228,18 @@ function createMcpServer() {
 
   return server;
 }
+
+app.get("/billing/success", (req, res) => {
+  res.type("html").send(`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>KeepGoing subscription</title><style>body{font-family:system-ui;background:#0d1117;color:#fff;display:grid;place-items:center;min-height:100vh;margin:0}.card{max-width:560px;padding:32px;background:#161b22;border:1px solid #30363d;border-radius:18px}a{color:#58a6ff}</style></head><body><div class="card"><h1>KeepGoing subscription received</h1><p>Your Stripe checkout completed in this environment. Keep this page open while KeepGoing confirms your subscription.</p><p><a href="/">Return to KeepGoing</a></p></div></body></html>`);
+});
+
+app.get("/billing/plans", (_req, res) => {
+  res.json({
+    free: { price_gbp: 0, jobs_per_month: 3 },
+    pro: { price_gbp: 7.99, price_id: PRO_PRICE_ID, jobs_per_month: 100 },
+    business: { price_gbp: 29, price_id: BUSINESS_PRICE_ID, jobs_per_month: 500 }
+  });
+});
 
 app.get("/health", (_req, res) => {
   res.json({ ok: true, name: "KeepGoing MCP", version: "0.6.0", openaiConfigured: Boolean(OPENAI_API_KEY), protected: true, model: MODEL });
