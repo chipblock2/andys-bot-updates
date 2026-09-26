@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "syncedAt": "2026-09-26T10:35:00.000Z",
+  "syncedAt": "2026-09-26T11:02:44.785Z",
   "source": "Ask Shropshire Content Hub (Airtable)",
   "events": [
     {
@@ -6447,8 +6447,8 @@
       "wouldBuyAgainCount": 0,
       "verifiedReviewCount": 0,
       "photoUrl": null,
-      "latitude": null,
-      "longitude": null
+      "latitude": 52.696022,
+      "longitude": -2.452337
     },
     {
       "id": "reclAZDvXn0DGlj8V",
@@ -6490,8 +6490,8 @@
       "wouldBuyAgainCount": 0,
       "verifiedReviewCount": 0,
       "photoUrl": null,
-      "latitude": null,
-      "longitude": null
+      "latitude": 52.637018,
+      "longitude": -2.446364
     },
     {
       "id": "reclJ4pCq3NfTYsUI",
@@ -6533,8 +6533,8 @@
       "wouldBuyAgainCount": 0,
       "verifiedReviewCount": 0,
       "photoUrl": null,
-      "latitude": null,
-      "longitude": null
+      "latitude": 52.699489,
+      "longitude": -2.514181
     },
     {
       "id": "recoOuogGT8Qqla4N",
@@ -6576,8 +6576,8 @@
       "wouldBuyAgainCount": 0,
       "verifiedReviewCount": 0,
       "photoUrl": null,
-      "latitude": null,
-      "longitude": null
+      "latitude": 52.695926,
+      "longitude": -2.436369
     },
     {
       "id": "recv1t9LfQqCLF7se",
@@ -6621,8 +6621,8 @@
       "wouldBuyAgainCount": 0,
       "verifiedReviewCount": 0,
       "photoUrl": null,
-      "latitude": null,
-      "longitude": null
+      "latitude": 52.663856,
+      "longitude": -2.468001
     },
     {
       "id": "recKGevyOo0J9oO4L",
@@ -6663,8 +6663,8 @@
       "wouldBuyAgainCount": 0,
       "verifiedReviewCount": 0,
       "photoUrl": null,
-      "latitude": null,
-      "longitude": null
+      "latitude": 52.696022,
+      "longitude": -2.452337
     },
     {
       "id": "recIuWmJceKjOazQp",
@@ -6705,8 +6705,8 @@
       "wouldBuyAgainCount": 0,
       "verifiedReviewCount": 0,
       "photoUrl": null,
-      "latitude": null,
-      "longitude": null
+      "latitude": 52.633317,
+      "longitude": -2.43591
     },
     {
       "id": "recIVmdtgEHbkf0ef",
@@ -6748,8 +6748,8 @@
       "wouldBuyAgainCount": 0,
       "verifiedReviewCount": 0,
       "photoUrl": null,
-      "latitude": null,
-      "longitude": null
+      "latitude": 52.695926,
+      "longitude": -2.436369
     },
     {
       "id": "recPodKqzzbyjbTit",
@@ -6791,8 +6791,8 @@
       "wouldBuyAgainCount": 0,
       "verifiedReviewCount": 0,
       "photoUrl": null,
-      "latitude": null,
-      "longitude": null
+      "latitude": 52.637018,
+      "longitude": -2.446364
     },
     {
       "id": "recUC9wwZgL44o579",
@@ -6834,8 +6834,8 @@
       "wouldBuyAgainCount": 0,
       "verifiedReviewCount": 0,
       "photoUrl": null,
-      "latitude": null,
-      "longitude": null
+      "latitude": 52.650645,
+      "longitude": -2.441254
     },
     {
       "id": "recxMibSiQloJ4Pnq",
@@ -6876,8 +6876,8 @@
       "wouldBuyAgainCount": 0,
       "verifiedReviewCount": 0,
       "photoUrl": null,
-      "latitude": null,
-      "longitude": null
+      "latitude": 52.711921,
+      "longitude": -2.500254
     }
   ]
 }
