@@ -24,3 +24,4 @@ function applyPatch(dir, expected, label) {
 
 applyPatch(here,"aacee8e91e8ecd8c7995b4cd28c99be1a6c5368ebd4e8cda99d263194303e13d","DeployBridge v1.2 review patch");
 applyPatch(path.join(root,"patch-v12b"),"69082e208122761b82bca1ec1afca75e2b5e403c7a0d64db4d48d183cca93750","DeployBridge v1.2 health patch");
+applyPatch(path.join(root,"patch-v12c"),"75bd54f682bb85cd5d34421583b2521979a13c484353c3c647f76460bf379dfb","DeployBridge v1.2 route patch");
