@@ -116,10 +116,28 @@ async function cancelJob(jobId) {
   return { job_id: data.id || jobId, status: data.status || "cancelled" };
 }
 
+const TERMINAL_STATUSES = new Set(["completed", "failed", "cancelled", "expired", "incomplete"]);
+
+async function waitForJob(jobId, waitSeconds = 20) {
+  const deadline = Date.now() + Math.max(1, Math.min(Number(waitSeconds) || 20, 25)) * 1000;
+  let latest = await getJob(jobId);
+  while (!TERMINAL_STATUSES.has(latest.status) && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    latest = await getJob(jobId);
+  }
+  return {
+    ...latest,
+    should_continue_polling: !TERMINAL_STATUSES.has(latest.status),
+    message: TERMINAL_STATUSES.has(latest.status)
+      ? "KeepGoing reached a terminal state."
+      : "KeepGoing is still running. Call wait_for_persistent_job again with the same job_id. Do not ask the user to type continue."
+  };
+}
+
 function createMcpServer() {
   const server = new McpServer(
-    { name: "KeepGoing", version: "0.5.0" },
-    { instructions: "Use KeepGoing for substantial model-only work or research that should continue as a background response instead of stopping at a normal chat-turn boundary. Reuse the same job_id. KeepGoing does not automatically control other ChatGPT plugins, desktops, payments, or private accounts." }
+    { name: "KeepGoing", version: "0.6.0" },
+    { instructions: "Use KeepGoing for substantial model-only work or research that should continue as a background response instead of stopping at a normal chat-turn boundary. Start one job, preserve its job_id, then call wait_for_persistent_job. If should_continue_polling is true, call wait_for_persistent_job again with the same job_id without asking the user to type continue. Reuse the same job_id and never create duplicate jobs just to keep working. KeepGoing does not automatically control other ChatGPT plugins, desktops, payments, or private accounts." }
   );
 
   server.registerTool("start_persistent_job", {
@@ -151,6 +169,21 @@ function createMcpServer() {
     }
   });
 
+  server.registerTool("wait_for_persistent_job", {
+    description: "Wait and poll an existing KeepGoing job for up to 25 seconds. If should_continue_polling is true, call this tool again with the same job_id automatically instead of asking the user to type continue.",
+    inputSchema: {
+      job_id: z.string().min(1).max(200),
+      wait_seconds: z.number().int().min(1).max(25).default(20)
+    }
+  }, async ({ job_id, wait_seconds }) => {
+    try {
+      const result = await waitForJob(job_id, wait_seconds);
+      return { content: [{ type: "text", text: JSON.stringify(result) }], structuredContent: result };
+    } catch (error) {
+      return { isError: true, content: [{ type: "text", text: String(error?.message || error) }] };
+    }
+  });
+
   server.registerTool("cancel_persistent_job", {
     description: "Cancel a KeepGoing background job.",
     inputSchema: { job_id: z.string().min(1).max(200) }
@@ -167,7 +200,7 @@ function createMcpServer() {
 }
 
 app.get("/health", (_req, res) => {
-  res.json({ ok: true, name: "KeepGoing MCP", version: "0.5.0", openaiConfigured: Boolean(OPENAI_API_KEY), protected: true, model: MODEL });
+  res.json({ ok: true, name: "KeepGoing MCP", version: "0.6.0", openaiConfigured: Boolean(OPENAI_API_KEY), protected: true, model: MODEL });
 });
 
 app.post("/mcp", async (req, res) => {
@@ -191,4 +224,4 @@ app.get("/mcp", (req, res) => {
   res.status(405).json({ error: "Use POST for stateless MCP" });
 });
 
-app.listen(PORT, "0.0.0.0", () => console.log("KeepGoing MCP v0.5.0 listening on " + PORT));
+app.listen(PORT, "0.0.0.0", () => console.log("KeepGoing MCP v0.6.0 listening on " + PORT));
