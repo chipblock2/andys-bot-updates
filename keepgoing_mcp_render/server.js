@@ -1,24 +1,40 @@
 import express from "express";
 import crypto from "crypto";
-import Stripe from "stripe";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { z } from "zod";
 
 const app = express();
-const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || "";
 const PRO_PRICE_ID = process.env.KEEPGOING_PRO_PRICE_ID || "price_1UJy24B86Ss16l9WEsqSRxh1";
 const BUSINESS_PRICE_ID = process.env.KEEPGOING_BUSINESS_PRICE_ID || "price_1UJy26B86Ss16l9W8id4FSsw";
 
 app.post("/stripe/webhook", express.raw({ type: "application/json" }), async (req, res) => {
-  if (!stripe || !STRIPE_WEBHOOK_SECRET) return res.status(503).send("Stripe webhook not configured");
-  let event;
+  if (!STRIPE_WEBHOOK_SECRET) return res.status(503).send("Stripe webhook not configured");
+  const header = String(req.headers["stripe-signature"] || "");
+  const parts = Object.fromEntries(header.split(",").map((p) => p.split("=", 2)));
+  const timestamp = parts.t || "";
+  const signature = parts.v1 || "";
+  if (!timestamp || !signature) return res.status(400).send("Invalid webhook signature");
+
+  const age = Math.abs(Math.floor(Date.now() / 1000) - Number(timestamp));
+  if (!Number.isFinite(age) || age > 300) return res.status(400).send("Webhook timestamp outside tolerance");
+
+  const payload = req.body.toString("utf8");
+  const expected = crypto
+    .createHmac("sha256", STRIPE_WEBHOOK_SECRET)
+    .update(timestamp + "." + payload, "utf8")
+    .digest("hex");
+
+  let verified = false;
   try {
-    event = stripe.webhooks.constructEvent(req.body, req.headers["stripe-signature"], STRIPE_WEBHOOK_SECRET);
-  } catch (error) {
-    return res.status(400).send("Invalid webhook signature");
-  }
+    verified = crypto.timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(signature, "hex"));
+  } catch {}
+  if (!verified) return res.status(400).send("Invalid webhook signature");
+
+  let event;
+  try { event = JSON.parse(payload); }
+  catch { return res.status(400).send("Invalid JSON"); }
 
   const relevant = new Set([
     "checkout.session.completed",
@@ -236,8 +252,8 @@ app.get("/billing/success", (req, res) => {
 app.get("/billing/plans", (_req, res) => {
   res.json({
     free: { price_gbp: 0, jobs_per_month: 3 },
-    pro: { price_gbp: 7.99, price_id: PRO_PRICE_ID, jobs_per_month: 100 },
-    business: { price_gbp: 29, price_id: BUSINESS_PRICE_ID, jobs_per_month: 500 }
+    pro: { price_gbp: 7.99, price_id: PRO_PRICE_ID, jobs_per_month: 100, checkout_url: "https://buy.stripe.com/test_aFa14m1Jeaee3Wg3WEao800" },
+    business: { price_gbp: 29, price_id: BUSINESS_PRICE_ID, jobs_per_month: 500, checkout_url: "https://buy.stripe.com/test_fZu6oG73yfyygJ28cUao801" }
   });
 });
 
