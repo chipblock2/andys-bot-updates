@@ -8,6 +8,11 @@ const app = express();
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || "";
 const PRO_PRICE_ID = process.env.KEEPGOING_PRO_PRICE_ID || "price_1UJy24B86Ss16l9WEsqSRxh1";
 const BUSINESS_PRICE_ID = process.env.KEEPGOING_BUSINESS_PRICE_ID || "price_1UJy26B86Ss16l9W8id4FSsw";
+const BILLING_INGEST_URL = process.env.KEEPGOING_BILLING_INGEST_URL || "";
+const BILLING_INGEST_TOKEN = process.env.KEEPGOING_BILLING_INGEST_TOKEN || "";
+const CLAIM_URL = process.env.KEEPGOING_CLAIM_URL || "";
+const AUTH_URL = process.env.KEEPGOING_AUTH_URL || "";
+const PORTAL_URL = process.env.KEEPGOING_PORTAL_URL || "https://billing.stripe.com/p/login/test_aFa14m1Jeaee3Wg3WEao800";
 
 app.post("/stripe/webhook", express.raw({ type: "application/json" }), async (req, res) => {
   if (!STRIPE_WEBHOOK_SECRET) return res.status(503).send("Stripe webhook not configured");
@@ -47,6 +52,27 @@ app.post("/stripe/webhook", express.raw({ type: "application/json" }), async (re
 
   if (relevant.has(event.type)) {
     console.log("stripe_event", event.type, event.data?.object?.id || "");
+    if (!BILLING_INGEST_URL || !BILLING_INGEST_TOKEN) {
+      return res.status(503).json({ error: "billing_ingest_not_configured" });
+    }
+    try {
+      const forward = await fetch(BILLING_INGEST_URL, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-keepgoing-ingest-token": BILLING_INGEST_TOKEN
+        },
+        body: JSON.stringify({ type: event.type, object: event.data?.object || {} })
+      });
+      if (!forward.ok) {
+        const detail = await forward.text().catch(() => "");
+        console.error("billing_ingest_failed", forward.status, detail.slice(0, 300));
+        return res.status(500).json({ error: "billing_ingest_failed" });
+      }
+    } catch (error) {
+      console.error("billing_ingest_error", String(error?.message || error));
+      return res.status(500).json({ error: "billing_ingest_error" });
+    }
   }
   return res.json({ received: true });
 });
@@ -62,12 +88,31 @@ function digest(value) {
   return crypto.createHash("sha256").update(value || "").digest("hex");
 }
 
-function authorised(req) {
+function requestToken(req) {
   const queryToken = typeof req.query?.token === "string" ? req.query.token : "";
   const headerToken = req.get("x-keepgoing-token") || "";
   const auth = req.get("authorization") || "";
   const bearer = auth.toLowerCase().startsWith("bearer ") ? auth.slice(7).trim() : "";
-  return [queryToken, headerToken, bearer].some((v) => v && digest(v) === TOKEN_HASH);
+  return [queryToken, headerToken, bearer].find(Boolean) || "";
+}
+
+async function authorise(req, consume = false) {
+  const token = requestToken(req);
+  if (!token) return { ok: false, error: "token_required" };
+  if (digest(token) === TOKEN_HASH) return { ok: true, admin: true, tier: "owner", remaining: null };
+  if (!AUTH_URL) return { ok: false, error: "billing_auth_not_configured" };
+  try {
+    const response = await fetch(AUTH_URL, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ token, consume })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.allowed) return { ok: false, status: response.status, ...data };
+    return { ok: true, admin: false, ...data };
+  } catch (error) {
+    return { ok: false, error: String(error?.message || error) };
+  }
 }
 
 function outputText(data) {
@@ -245,15 +290,41 @@ function createMcpServer() {
   return server;
 }
 
+app.post("/billing/claim", async (req, res) => {
+  const sessionId = String(req.body?.session_id || "");
+  if (!sessionId) return res.status(400).json({ error: "session_id_required" });
+  if (!CLAIM_URL) return res.status(503).json({ error: "claim_not_configured" });
+  try {
+    const response = await fetch(CLAIM_URL, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ session_id: sessionId })
+    });
+    const data = await response.json().catch(() => ({}));
+    return res.status(response.status).json(data);
+  } catch (error) {
+    return res.status(502).json({ error: String(error?.message || error) });
+  }
+});
+
 app.get("/billing/success", (req, res) => {
-  res.type("html").send(`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>KeepGoing subscription</title><style>body{font-family:system-ui;background:#0d1117;color:#fff;display:grid;place-items:center;min-height:100vh;margin:0}.card{max-width:560px;padding:32px;background:#161b22;border:1px solid #30363d;border-radius:18px}a{color:#58a6ff}</style></head><body><div class="card"><h1>KeepGoing subscription received</h1><p>Your Stripe checkout completed in this environment. Keep this page open while KeepGoing confirms your subscription.</p><p><a href="/">Return to KeepGoing</a></p></div></body></html>`);
+  const sessionId = String(req.query.session_id || "");
+  const sessionJson = JSON.stringify(sessionId);
+  const html = '<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>KeepGoing subscription</title><style>body{font-family:system-ui;background:#0d1117;color:#fff;display:grid;place-items:center;min-height:100vh;margin:0;padding:20px}.card{max-width:680px;padding:32px;background:#161b22;border:1px solid #30363d;border-radius:18px;width:100%;box-sizing:border-box}button,a{color:#58a6ff}code{display:block;word-break:break-all;background:#0d1117;padding:14px;border-radius:10px;margin:14px 0}.ok{color:#3fb950}.muted{color:#8b949e}</style></head><body><div class="card"><h1>KeepGoing subscription</h1><p id="status">Confirming your Stripe subscription…</p><div id="result"></div><p><a href="/">Return to plans</a></p></div><script>const sessionId=' + sessionJson + ';(async()=>{const status=document.getElementById("status"),result=document.getElementById("result");if(!sessionId){status.textContent="Missing checkout session.";return;}for(let i=0;i<12;i++){const r=await fetch("/billing/claim",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({session_id:sessionId})});const j=await r.json().catch(()=>({}));if(r.ok&&j.token){const mcp=location.origin+"/mcp?token="+encodeURIComponent(j.token);status.innerHTML="<span class=\"ok\">Subscription active.</span>";result.innerHTML="<p>Your "+j.tier+" plan includes "+j.monthly_limit+" KeepGoing jobs per month.</p><p>Copy this private MCP address into ChatGPT:</p><code id=\"mcp\"></code><button id=\"copy\">Copy MCP address</button><p class=\"muted\">Keep this address private. Claiming again rotates the token.</p>";document.getElementById("mcp").textContent=mcp;document.getElementById("copy").onclick=()=>navigator.clipboard.writeText(mcp);return;}if(j.error!=="subscription_not_found"){status.textContent=j.error||"Could not activate subscription.";return;}await new Promise(r=>setTimeout(r,1500));}status.textContent="Payment completed, but activation is still processing. Refresh this page in a moment.";})().catch(()=>{document.getElementById("status").textContent="Could not confirm subscription.";});</script></body></html>';
+  res.type("html").send(html);
+});
+
+app.get("/", (_req, res) => {
+  const html = '<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>KeepGoing</title><style>body{font-family:system-ui;background:#0d1117;color:#fff;margin:0;padding:36px}.wrap{max-width:980px;margin:auto}.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}.card{background:#161b22;border:1px solid #30363d;border-radius:18px;padding:24px}.price{font-size:34px;font-weight:700}a.btn{display:inline-block;background:#238636;color:#fff;text-decoration:none;padding:12px 16px;border-radius:10px;margin-top:12px}.muted,a{color:#8b949e}.btn{color:#fff!important}</style></head><body><div class="wrap"><h1>KeepGoing</h1><p>Persistent AI background jobs. Start the job once and KeepGoing keeps checking it without repeated “continue” prompts.</p><div class="plans"><div class="card"><h2>Free</h2><div class="price">£0</div><p>3 jobs/month</p><p class="muted">Free account rollout follows the paid beta.</p></div><div class="card"><h2>Pro</h2><div class="price">£7.99<span style="font-size:16px">/mo</span></div><p>100 jobs/month</p><a class="btn" href="https://buy.stripe.com/test_aFa14m1Jeaee3Wg3WEao800">Choose Pro</a></div><div class="card"><h2>Business</h2><div class="price">£29<span style="font-size:16px">/mo</span></div><p>500 jobs/month</p><a class="btn" href="https://buy.stripe.com/test_fZu6oG73yfyygJ28cUao801">Choose Business</a></div></div><p><a href="' + PORTAL_URL + '">Manage subscription</a></p><p class="muted">Sandbox billing — no real charges yet.</p></div></body></html>';
+  res.type("html").send(html);
 });
 
 app.get("/billing/plans", (_req, res) => {
   res.json({
     free: { price_gbp: 0, jobs_per_month: 3 },
     pro: { price_gbp: 7.99, price_id: PRO_PRICE_ID, jobs_per_month: 100, checkout_url: "https://buy.stripe.com/test_aFa14m1Jeaee3Wg3WEao800" },
-    business: { price_gbp: 29, price_id: BUSINESS_PRICE_ID, jobs_per_month: 500, checkout_url: "https://buy.stripe.com/test_fZu6oG73yfyygJ28cUao801" }
+    business: { price_gbp: 29, price_id: BUSINESS_PRICE_ID, jobs_per_month: 500, checkout_url: "https://buy.stripe.com/test_fZu6oG73yfyygJ28cUao801" },
+    portal_url: PORTAL_URL
   });
 });
 
@@ -262,7 +333,9 @@ app.get("/health", (_req, res) => {
 });
 
 app.post("/mcp", async (req, res) => {
-  if (!authorised(req)) return res.status(401).json({ error: "unauthorized" });
+  const isStart = req.body?.method === "tools/call" && req.body?.params?.name === "start_persistent_job";
+  const access = await authorise(req, isStart);
+  if (!access.ok) return res.status(access.status || 401).json({ error: access.error || "unauthorized", tier: access.tier, used: access.used, limit: access.limit });
   const server = createMcpServer();
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   res.on("close", async () => {
@@ -277,8 +350,9 @@ app.post("/mcp", async (req, res) => {
   }
 });
 
-app.get("/mcp", (req, res) => {
-  if (!authorised(req)) return res.status(401).json({ error: "unauthorized" });
+app.get("/mcp", async (req, res) => {
+  const access = await authorise(req, false);
+  if (!access.ok) return res.status(access.status || 401).json({ error: access.error || "unauthorized" });
   res.status(405).json({ error: "Use POST for stateless MCP" });
 });
 
