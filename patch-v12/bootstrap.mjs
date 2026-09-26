@@ -2,9 +2,11 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
-const root=process.cwd();
-const patchDir=path.join(root,"patch-v12");
+const here=path.dirname(fileURLToPath(import.meta.url));
+const root=path.dirname(here);
+const patchDir=here;
 const target=path.join(root,".deploybridge","deploybridge-v1");
 const expected="aacee8e91e8ecd8c7995b4cd28c99be1a6c5368ebd4e8cda99d263194303e13d";
 
